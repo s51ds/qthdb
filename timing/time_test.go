@@ -294,3 +294,16 @@ func TestLogTime_Year(t1 *testing.T) {
 		})
 	}
 }
+
+func TestLogTime_String(t1 *testing.T) {
+	lt, err := MakeLogTime("20210403", "1514")
+	if err != nil {
+		t1.Error(err.Error())
+	} else {
+		want := "2021-04-03 15:14:00 +0000 UTC"
+		if lt.String() != want {
+			t1.Errorf("want:[%s], got:[%s]", want, lt.String())
+		}
+	}
+
+}
