@@ -1,4 +1,5 @@
-package schema
+// Package row implements smart row in the table; qthdb has only one table
+package row
 
 import (
 	"errors"
@@ -7,19 +8,19 @@ import (
 	"strings"
 )
 
-// empty is used in maps where only key is important
+// empty is used in maps where only key has value
 type empty struct{}
 
 // CallSign is just a string
 type CallSign string
 
-// Locator  is just a string
+// Locator is just a string
 type Locator string
 
-// LocatorTimes
+// LocatorTimes has primary key LogTime
 type LocatorTimes map[timing.LogTime]empty
 
-//
+// Locators has primary key Locator, value is LocatorTimes
 type Locators map[Locator]LocatorTimes
 
 // Record consists from callSign associated with zero or more locators
@@ -43,7 +44,9 @@ func (r *Record) String() string {
 	return sb.String()
 }
 
-// MakeNewRecord returns new record
+// MakeNewRecord returns new record, callSign is mandatory, others params can be empty strings.
+// If locator is not empty than the last two can be empty. If they are not, the syntax check is strict,
+// and an error can be returned.
 func MakeNewRecord(callSign CallSign, locator Locator, yyyymmdd, hhmm string) (Record, error) {
 	if callSign == "" {
 		return Record{}, errors.New("callSign is empty")
@@ -64,7 +67,10 @@ func MakeNewRecord(callSign CallSign, locator Locator, yyyymmdd, hhmm string) (R
 	}
 }
 
-// Update locator
+// Update updates locators with a new locator or updates the current locator's
+// data.
+// If yyyymmdd and hhmm are not empty strings, the syntax check is strict,
+// error can be returned
 func (r *Record) Update(locator Locator, yyyymmdd, hhmm string) error {
 	if locator == "" {
 		return errors.New("locator is empty")

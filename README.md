@@ -1,2 +1,11 @@
 # qthdb
-qthdb is locator databes used for VHF/UHF hamradio contest
+
+### can be used by VHF/UHF HAM contesters
+
+### qthdb is locator database
+
+### qthdb has only one table, its rows are "smart"
+
+
+
+
