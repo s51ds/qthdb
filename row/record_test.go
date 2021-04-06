@@ -232,3 +232,78 @@ func TestRecord_Update(t *testing.T) {
 	fmt.Println(rec.String())
 
 }
+
+func TestMakeNewRecord1(t *testing.T) {
+	// only merge
+	recMain, _ := MakeNewRecord("S59ABC", "", "", "")
+	recNew, _ := MakeNewRecord("S59ABC", "JN76TO", "", "")
+	//
+	fmt.Println("recMain->", recMain.String())
+	fmt.Println(" recNew->", recNew.String())
+	//
+	_ = recMain.Merge(recNew)
+	fmt.Println("\nMERGE")
+	fmt.Println("recMain->", recMain.String())
+	//
+	recNew, _ = MakeNewRecord("S59ABC", "JN76TO", "20210406", "1619")
+	_ = recMain.Merge(recNew)
+	fmt.Println("\nMERGE")
+	fmt.Println("recMain->", recMain.String())
+	//
+	recNew, _ = MakeNewRecord("S59ABC", "JN76TO", "20210406", "1619")
+	_ = recMain.Merge(recNew)
+	fmt.Println("\nMERGE")
+	fmt.Println("recMain->", recMain.String())
+	//
+	recNew, _ = MakeNewRecord("S59ABC", "JN76PO", "20210406", "1619")
+	_ = recMain.Merge(recNew)
+	fmt.Println("\nMERGE")
+	fmt.Println("recMain->", recMain.String())
+	//
+	recNew, _ = MakeNewRecord("S59ABC", "JN76PO", "20210406", "1645")
+	_ = recMain.Merge(recNew)
+	fmt.Println("\nMERGE")
+	fmt.Println("recMain->", recMain.String())
+
+}
+
+func TestMakeNewRecord2(t *testing.T) {
+	// update and merge
+
+	recMain, _ := MakeNewRecord("S59ABC", "", "", "")
+	_ = recMain.Update("JN76T0", "", "")
+	_ = recMain.Update("JN76P0", "", "")
+	_ = recMain.Update("JN76T0", "20210604", "1000")
+	_ = recMain.Update("JN76P0", "20210604", "1000")
+	_ = recMain.Update("JN76T0", "20210604", "1001")
+	_ = recMain.Update("JN76P0", "20210604", "1001")
+	//
+	fmt.Println("recMain->", recMain.String())
+
+	recNew, _ := MakeNewRecord("S59ABC", "", "", "")
+	_ = recNew.Update("JN76T0", "", "")
+	_ = recNew.Update("JN76P0", "", "")
+	_ = recNew.Update("JN76T0", "20210604", "1000")
+	_ = recNew.Update("JN76P0", "20210604", "1000")
+	_ = recNew.Update("JN76T0", "20210604", "1001")
+	_ = recNew.Update("JN76P0", "20210604", "1001")
+	//
+	fmt.Println(" recNew->", recMain.String())
+	_ = recMain.Merge(recNew)
+	fmt.Println("\nMERGE")
+	fmt.Println("recMain->", recMain.String())
+
+	recNew, _ = MakeNewRecord("S59ABC", "", "", "")
+	_ = recNew.Update("JN76T0", "", "")
+	_ = recNew.Update("JN76P0", "", "")
+	_ = recNew.Update("JN76T0", "20210604", "2000")
+	_ = recNew.Update("JN76P0", "20210604", "2000")
+	_ = recNew.Update("JN76T0", "20210604", "2001")
+	_ = recNew.Update("JN76P0", "20210604", "2001")
+	//
+	fmt.Println(" recNew->", recMain.String())
+	_ = recMain.Merge(recNew)
+	fmt.Println("\nMERGE")
+	fmt.Println("recMain->", recMain.String())
+
+}

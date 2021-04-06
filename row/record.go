@@ -29,19 +29,24 @@ type Record struct {
 	locators Locators
 }
 
-func (r *Record) String() string {
-	sb := strings.Builder{}
-	sb.WriteString("Record{")
-	sb.WriteString(fmt.Sprintf("callSign:%s, locators[", r.callSign))
-	for k0, v0 := range r.locators {
-		sb.WriteString(fmt.Sprintf("%s:[", string(k0)))
-		for k1 := range v0 {
-			sb.WriteString(fmt.Sprintf("%s, ", k1.String()))
-		}
-		sb.WriteString("],")
+//Merge merges r in n. Returns error if r and n callSign is not the same
+func (r *Record) Merge(n Record) error {
+	if r.callSign != n.callSign {
+		return errors.New(fmt.Sprintf("n callSign:%s is not the same as in current record: %s", n.callSign, r.callSign))
 	}
-	sb.WriteString("]}")
-	return sb.String()
+
+	for kNLocator, vNLocatorTimes := range n.locators {
+		if _, has := r.locators[kNLocator]; has {
+			locatorTimes := r.locators[kNLocator]
+			for k := range n.locators[kNLocator] {
+				locatorTimes[k] = empty{}
+			}
+		} else { // newLocator does not exist in exist in r
+			r.locators[kNLocator] = vNLocatorTimes
+		}
+	}
+
+	return nil
 }
 
 // MakeNewRecord returns new record, callSign is mandatory, others params can be empty strings.
@@ -87,4 +92,23 @@ func (r *Record) Update(locator Locator, yyyymmdd, hhmm string) error {
 		r.locators[locator] = locatorsWithTime
 	}
 	return nil
+}
+
+func (r *Record) CallSign() CallSign {
+	return r.callSign
+}
+
+func (r *Record) String() string {
+	sb := strings.Builder{}
+	sb.WriteString("Record{")
+	sb.WriteString(fmt.Sprintf("callSign:%s, locators[", r.callSign))
+	for k0, v0 := range r.locators {
+		sb.WriteString(fmt.Sprintf("%s:[", string(k0)))
+		for k1 := range v0 {
+			sb.WriteString(fmt.Sprintf("%s, ", k1.String()))
+		}
+		sb.WriteString("],")
+	}
+	sb.WriteString("]}")
+	return sb.String()
 }
