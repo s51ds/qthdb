@@ -29,7 +29,8 @@ func String() string {
 	return sb.String()
 }
 
-func Update(record row.Record) (err error) {
+// Put creates or updates the record in the table if record already exists
+func Put(record row.Record) (err error) {
 	callSign := record.CallSign()
 	if r, has := table.rows[callSign]; has {
 		err = r.Merge(record)
@@ -39,6 +40,10 @@ func Update(record row.Record) (err error) {
 	return err
 }
 
-func Get(callSign row.CallSign) row.Record {
-	return table.rows[callSign]
+// Get returns record and true if record for callSign exists in the table
+// otherwise zero value record and false is returned.
+func Get(callSign row.CallSign) (record row.Record, found bool) {
+	callSign = row.CallSign(strings.ToUpper(string(callSign)))
+	record, found = table.rows[callSign]
+	return
 }

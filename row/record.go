@@ -53,6 +53,7 @@ func (r *Record) Merge(n Record) error {
 // If locator is not empty than the last two can be empty. If they are not, the syntax check is strict,
 // and an error can be returned.
 func MakeNewRecord(callSign CallSign, locator Locator, yyyymmdd, hhmm string) (Record, error) {
+	callSign = CallSign(strings.ToUpper(string(callSign)))
 	if callSign == "" {
 		return Record{}, errors.New("callSign is empty")
 	}
