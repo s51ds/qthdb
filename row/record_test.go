@@ -35,6 +35,35 @@ func Test_makeNewRecordNew(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid call sign",
+			args: args{
+				callSign: "59abc",
+				locator:  "",
+				yyyymmdd: "",
+				hhmm:     "",
+			},
+			want: Record{
+				callSign: "",
+				locators: nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid locator",
+			args: args{
+				callSign: "s59abc",
+				locator:  "76to",
+				yyyymmdd: "",
+				hhmm:     "",
+			},
+			want: Record{
+				callSign: "",
+				locators: nil,
+			},
+			wantErr: true,
+		},
+
+		{
 			name: "yyyy",
 			args: args{
 				callSign: "S59ABC",
@@ -306,4 +335,13 @@ func TestMakeNewRecord2(t *testing.T) {
 	fmt.Println("\nMERGE")
 	fmt.Println("recMain->", recMain.String())
 
+}
+
+func TestMakeNewRecord3(t *testing.T) {
+	// update wrong locator
+
+	recMain, _ := MakeNewRecord("S59ABC", "JN76TO", "", "")
+	if err := recMain.Update("JN76T9", "20210604", "1000"); err == nil {
+		t.Error("WTF-invalid locator not detected ")
+	}
 }
