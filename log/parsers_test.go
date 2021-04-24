@@ -444,3 +444,59 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 		})
 	}
 }
+
+func Test_parseEdiQsoRecord(t *testing.T) {
+	//210306;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;
+	rec, _ := row.MakeNewRecord(row.CallSign("S56P"), row.Locator("JN76PO"), "20210306", "1428")
+	type args struct {
+		line string
+		sep  string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantRecord row.Record
+		wantErr    bool
+	}{
+		{
+			name: "err-1",
+			args: args{
+				line: "210306;1428;S56P;1;59;004;59;025;;",
+				sep:  "",
+			},
+			wantRecord: row.Record{},
+			wantErr:    true,
+		},
+		{
+			name: "err-2",
+			args: args{
+				line: "21030;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;",
+				sep:  "",
+			},
+			wantRecord: row.Record{},
+			wantErr:    true,
+		},
+
+		{
+			name: "ok",
+			args: args{
+				line: "210306;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;",
+				sep:  "",
+			},
+			wantRecord: rec,
+			wantErr:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRecord, err := parseEdiQsoRecord(tt.args.line, tt.args.sep)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseEdiQsoRecord() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRecord, tt.wantRecord) {
+				t.Errorf("parseEdiQsoRecord() gotRecord = %v, want %v", gotRecord, tt.wantRecord)
+			}
+		})
+	}
+}

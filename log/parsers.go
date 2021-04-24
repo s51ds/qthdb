@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/s51ds/qthdb/row"
+	"github.com/s51ds/qthdb/timing"
 	"log"
 	"regexp"
 	"strings"
@@ -127,6 +128,23 @@ func parseN1mmGenericFileLine(line string, sep string) (record row.Record, err e
 		return record, errors.New(fmt.Sprintf("wrong line:%s", line))
 	}
 	if record, err = row.MakeNewRecord(row.CallSign(ss[8]), row.Locator(ss[11]), ss[0], ss[1]); err != nil {
+		return row.Record{}, err
+	}
+	return
+}
+
+func parseEdiQsoRecord(line string, sep string) (record row.Record, err error) {
+	// 210306;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;
+	//    0     1    2   3  4  5  6  7   8  9
+	ss := strings.Split(line, ";")
+	if len(ss) <= 10 {
+		return record, errors.New(fmt.Sprintf("wrong format of EDI QSORecord:%s", line))
+	}
+	yyyymmdd := ss[0]
+	if yyyymmdd, err = timing.FourDigitsYear(yyyymmdd); err != nil {
+		return
+	}
+	if record, err = row.MakeNewRecord(row.CallSign(ss[2]), row.Locator(ss[9]), yyyymmdd, ss[1]); err != nil {
 		return row.Record{}, err
 	}
 	return

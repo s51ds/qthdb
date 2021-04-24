@@ -307,3 +307,78 @@ func TestLogTime_String(t1 *testing.T) {
 	}
 
 }
+
+func TestFourDigitsYear(t *testing.T) {
+	type args struct {
+		yy string
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantYyyy string
+		wantErr  bool
+	}{
+		{
+			name: "20210423",
+			args: args{
+				yy: "20210423",
+			},
+			wantYyyy: "20210423",
+			wantErr:  false,
+		},
+		{
+			name: "err-1",
+			args: args{
+				yy: "123",
+			},
+			wantYyyy: "",
+			wantErr:  true,
+		},
+		{
+			name: "err-3",
+			args: args{
+				yy: "",
+			},
+			wantYyyy: "",
+			wantErr:  true,
+		},
+
+		{
+			name: "err-3",
+			args: args{
+				yy: "abc",
+			},
+			wantYyyy: "",
+			wantErr:  true,
+		},
+		{
+			name: "21",
+			args: args{
+				yy: "210423",
+			},
+			wantYyyy: "20210423",
+			wantErr:  false,
+		},
+
+		{
+			name: "19",
+			args: args{
+				yy: "990423",
+			},
+			wantYyyy: "19990423",
+			wantErr:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotYyyy, err := FourDigitsYear(tt.args.yy)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FourDigitsYear() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotYyyy != tt.wantYyyy {
+				t.Errorf("FourDigitsYear() gotYyyy = %v, want %v", gotYyyy, tt.wantYyyy)
+			}
+		})
+	}
+}

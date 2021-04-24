@@ -1,6 +1,8 @@
 package timing
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -95,4 +97,25 @@ func MakeLogTime(yyyymmdd, hhmm string) (logTime LogTime, err error) {
 	logTime.time = t
 
 	return
+}
+
+// FourDigitsYear convert yymmdd to yyyymmdd. if yy > 80 returns 19yymmdd
+func FourDigitsYear(yymmdd string) (yyyymmdd string, err error) {
+	if len(yymmdd) == 8 {
+		return yymmdd, nil
+	}
+	if len(yymmdd) != 6 || yymmdd == "" {
+		return "", errors.New(fmt.Sprintf("not a two digits year:%s", yymmdd))
+	}
+
+	yy := yymmdd[0:2]
+	var n int
+	if n, err = strconv.Atoi(yy); err != nil {
+		return "", err
+	}
+	if n > 80 {
+		return "19" + yymmdd, nil
+	} else {
+		return "20" + yymmdd, nil
+	}
 }
