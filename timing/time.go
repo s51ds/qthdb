@@ -11,7 +11,7 @@ type LogTime struct {
 	time time.Time
 }
 
-// LogTime implements sort.Interface based on time field
+// ByTime implements sort.Interface for LogTime based on time field
 type ByTime []LogTime
 
 func (a ByTime) Len() int           { return len(a) }
@@ -29,7 +29,8 @@ func (t *LogTime) String() string {
 }
 
 // Sprint returns formatted string with short names of month and year or empty string if time has zero value
-// hint: signed if LogTime has same the month of current time is; some stations changing the location based on the contest
+// hint: signed if LogTime has same the month as the current time has; some stations changing the location based on the contest
+// e.g. in March, station has different QTH locator as in September's contest
 func (t *LogTime) Sprint(hint bool) string {
 	if t.IsZero() {
 		return ""
@@ -74,8 +75,8 @@ func (t *LogTime) Year() string {
 }
 
 // IsZero returns true if LogTime has zero value (January 1, year 1, 00:00:00.000000000 UTC.)
-// LogTime has zero value if date and time was not available during data imports. Such case is
-// in case when import is from SCP file
+// LogTime has zero value if date and time was not available during data imports. Such case
+// the case when import is from SCP file
 func (t *LogTime) IsZero() bool {
 	return t.time.IsZero()
 }
