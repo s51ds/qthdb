@@ -377,7 +377,6 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 	rec, _ := row.MakeNewRecord("S52ME", "JN76TM", "20200704", "1453")
 	type args struct {
 		line string
-		sep  string
 	}
 	tests := []struct {
 		name       string
@@ -389,7 +388,6 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 			name: "wrong line",
 			args: args{
 				line: "20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 ",
-				sep:  "",
 			},
 			wantRecord: row.Record{},
 			wantErr:    true,
@@ -398,7 +396,6 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 			name: "ok",
 			args: args{
 				line: "20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
-				sep:  "",
 			},
 			wantRecord: rec,
 			wantErr:    false,
@@ -407,7 +404,6 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 			name: "err-1",
 			args: args{
 				line: "200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
-				sep:  "",
 			},
 			wantRecord: row.Record{},
 			wantErr:    true,
@@ -416,7 +412,6 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 			name: "err-2",
 			args: args{
 				line: "200704 1453UTC   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
-				sep:  "",
 			},
 			wantRecord: row.Record{},
 			wantErr:    true,
@@ -425,7 +420,6 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 			name: "err-3",
 			args: args{
 				line: "200704;1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
-				sep:  "",
 			},
 			wantRecord: row.Record{},
 			wantErr:    true,
@@ -433,7 +427,7 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRecord, err := parseN1mmGenericFileLine(tt.args.line, tt.args.sep)
+			gotRecord, err := parseN1mmGenericFileLine(tt.args.line)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseN1mmGenericFileLine() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -450,7 +444,6 @@ func Test_parseEdiQsoRecord(t *testing.T) {
 	rec, _ := row.MakeNewRecord(row.CallSign("S56P"), row.Locator("JN76PO"), "20210306", "1428")
 	type args struct {
 		line string
-		sep  string
 	}
 	tests := []struct {
 		name       string
@@ -462,7 +455,6 @@ func Test_parseEdiQsoRecord(t *testing.T) {
 			name: "err-1",
 			args: args{
 				line: "210306;1428;S56P;1;59;004;59;025;;",
-				sep:  "",
 			},
 			wantRecord: row.Record{},
 			wantErr:    true,
@@ -471,7 +463,6 @@ func Test_parseEdiQsoRecord(t *testing.T) {
 			name: "err-2",
 			args: args{
 				line: "21030;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;",
-				sep:  "",
 			},
 			wantRecord: row.Record{},
 			wantErr:    true,
@@ -481,7 +472,6 @@ func Test_parseEdiQsoRecord(t *testing.T) {
 			name: "ok",
 			args: args{
 				line: "210306;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;",
-				sep:  "",
 			},
 			wantRecord: rec,
 			wantErr:    false,
@@ -489,13 +479,80 @@ func Test_parseEdiQsoRecord(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRecord, err := parseEdiQsoRecord(tt.args.line, tt.args.sep)
+			gotRecord, err := parseEdiQsoRecord(tt.args.line)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseEdiQsoRecord() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotRecord, tt.wantRecord) {
 				t.Errorf("parseEdiQsoRecord() gotRecord = %v, want %v", gotRecord, tt.wantRecord)
+			}
+		})
+	}
+}
+
+func TestParse(t *testing.T) {
+	recEdi, _ := row.MakeNewRecord(row.CallSign("S59ABC"), row.Locator("JN76TO"), "20210306", "1428")
+	recHistory, _ := row.MakeNewRecord(row.CallSign("S59ABC"), row.Locator("JN76TO"), "", "")
+	recGeneric, _ := row.MakeNewRecord(row.CallSign("S52ME"), row.Locator("JN76TM"), "20200704", "1453")
+
+	type args struct {
+		logType Type
+		line    string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantRecord row.Record
+		wantErr    bool
+	}{
+
+		{
+			name: "edi",
+			args: args{
+				logType: TypeEdiFile,
+				line:    "210306;1428;S59ABC;1;59;004;59;025;;JN76TO;26;;;;",
+			},
+			wantRecord: recEdi,
+			wantErr:    false,
+		},
+		{
+			name: "N1mmCallHistory",
+			args: args{
+				logType: TypeN1mmCallHistory,
+				line:    "S59ABC,,JN76TO,",
+			},
+			wantRecord: recHistory,
+			wantErr:    false,
+		},
+		{
+			name: "N1mmGeneric",
+			args: args{
+				logType: TypeN1mmGenericFile,
+				line:    "20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
+			},
+			wantRecord: recGeneric,
+			wantErr:    false,
+		},
+		{
+			name: "unsupported log type",
+			args: args{
+				logType: 100,
+				line:    "abc",
+			},
+			wantRecord: row.Record{},
+			wantErr:    true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRecord, err := Parse(tt.args.logType, tt.args.line)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Parse() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRecord, tt.wantRecord) {
+				t.Errorf("Parse() gotRecord = %v, want %v", gotRecord, tt.wantRecord)
 			}
 		})
 	}

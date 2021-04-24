@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/s51ds/qthdb/row"
 	"github.com/s51ds/qthdb/timing"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -15,6 +14,7 @@ type Type int
 const (
 	TypeN1mmCallHistory Type = iota
 	TypeN1mmGenericFile
+	TypeEdiFile
 )
 
 var regex, _ = regexp.Compile("^[a-zA-Z0-9]")
@@ -38,15 +38,16 @@ func Parse(logType Type, line string) (record row.Record, err error) {
 	if !LineHasData(line) {
 		return record, err // no error, just skip the line
 	}
-	sep := DetectSeparator(line)
 	switch logType {
 	case TypeN1mmCallHistory:
+		sep := DetectSeparator(line)
 		return parseN1mmCallHistoryLine(line, sep)
 	case TypeN1mmGenericFile:
-		return parseN1mmGenericFileLine(line, sep)
+		return parseN1mmGenericFileLine(line)
+	case TypeEdiFile:
+		return parseEdiQsoRecord(line)
 	default:
-		log.Fatalln("WTF")
-		return
+		return row.Record{}, errors.New(fmt.Sprintf("Wrong logType:%d", logType))
 	}
 }
 
@@ -119,7 +120,7 @@ func parseN1mmCallHistoryLine(line string, sep string) (record row.Record, err e
 	return record, err
 }
 
-func parseN1mmGenericFileLine(line string, sep string) (record row.Record, err error) {
+func parseN1mmGenericFileLine(line string) (record row.Record, err error) {
 	// Date     Time    Freq     Mode MyCall        Snt Exchange    Call             Rcvd Exchange   Pts Comment
 	// 20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10
 	//    0       1      2         3    4             5  6    7       8               9   10   11      12
@@ -133,7 +134,7 @@ func parseN1mmGenericFileLine(line string, sep string) (record row.Record, err e
 	return
 }
 
-func parseEdiQsoRecord(line string, sep string) (record row.Record, err error) {
+func parseEdiQsoRecord(line string) (record row.Record, err error) {
 	// 210306;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;
 	//    0     1    2   3  4  5  6  7   8  9
 	ss := strings.Split(line, ";")
