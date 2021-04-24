@@ -1,0 +1,133 @@
+package log
+
+import (
+	"errors"
+	"fmt"
+	"github.com/s51ds/qthdb/row"
+	"log"
+	"regexp"
+	"strings"
+)
+
+type Type int
+
+const (
+	TypeN1mmCallHistory Type = iota
+	TypeN1mmGenericFile
+)
+
+var regex, _ = regexp.Compile("^[a-zA-Z0-9]")
+
+func LineHasData(line string) bool {
+	return regex.MatchString(line)
+}
+
+// DetectSeparator checks if separator is comma or semicolon. If no separators is detected
+// comma is returned
+func DetectSeparator(line string) string {
+	if strings.Contains(line, ";") {
+		return ";"
+	} else {
+		return ","
+	}
+
+}
+
+func Parse(logType Type, line string) (record row.Record, err error) {
+	if !LineHasData(line) {
+		return record, err // no error, just skip the line
+	}
+	sep := DetectSeparator(line)
+	switch logType {
+	case TypeN1mmCallHistory:
+		return parseN1mmCallHistoryLine(line, sep)
+	case TypeN1mmGenericFile:
+		return parseN1mmGenericFileLine(line, sep)
+	default:
+		log.Fatalln("WTF")
+		return
+	}
+}
+
+type dataLocatorsInputCase struct {
+	loc1 bool
+	loc2 bool
+}
+
+func (d *dataLocatorsInputCase) loc1andLoc2() bool {
+	return d.loc2 && d.loc1
+}
+
+func (d *dataLocatorsInputCase) loc1Only() bool {
+	return d.loc1 && !d.loc2
+}
+
+func (d *dataLocatorsInputCase) loc2Only() bool {
+	return !d.loc1 && d.loc2
+}
+
+func parseN1mmCallHistoryLine(line string, sep string) (record row.Record, err error) {
+	//   0   1  2      3
+	// S51IV,,JN76UP,JN76TO
+	ss := strings.Split(line, sep)
+	inputCase := dataLocatorsInputCase{}
+	switch len(ss) {
+	case 3:
+		{
+			if ss[2] != "" {
+				inputCase.loc1 = true
+			}
+		}
+	default:
+		if len(ss) > 2 && ss[2] != "" {
+			inputCase.loc1 = true
+		}
+		if len(ss) > 3 && ss[3] != "" {
+			inputCase.loc2 = true
+		}
+	}
+	switch {
+	case inputCase.loc1andLoc2():
+		{
+
+			if record, err = row.MakeNewRecord(row.CallSign(ss[0]), row.Locator(ss[2]), "", ""); err != nil {
+				return row.Record{}, err
+			}
+			if err = record.Update(row.Locator(ss[3]), "", ""); err != nil {
+				return row.Record{}, err
+			}
+		}
+	case inputCase.loc1Only():
+		{
+			if record, err = row.MakeNewRecord(row.CallSign(ss[0]), row.Locator(ss[2]), "", ""); err != nil {
+				return row.Record{}, err
+			}
+		}
+	case inputCase.loc2Only():
+		{
+			if record, err = row.MakeNewRecord(row.CallSign(ss[0]), row.Locator(ss[3]), "", ""); err != nil {
+				return row.Record{}, err
+			}
+		}
+	default:
+		if record, err = row.MakeNewRecord(row.CallSign(ss[0]), "", "", ""); err != nil {
+			return row.Record{}, err
+		}
+	}
+
+	return record, err
+}
+
+func parseN1mmGenericFileLine(line string, sep string) (record row.Record, err error) {
+	// Date     Time    Freq     Mode MyCall        Snt Exchange    Call             Rcvd Exchange   Pts Comment
+	// 20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10
+	//    0       1      2         3    4             5  6    7       8               9   10   11      12
+	ss := strings.Fields(line)
+	if len(ss) < 12 {
+		return record, errors.New(fmt.Sprintf("wrong line:%s", line))
+	}
+	if record, err = row.MakeNewRecord(row.CallSign(ss[8]), row.Locator(ss[11]), ss[0], ss[1]); err != nil {
+		return row.Record{}, err
+	}
+	return
+}

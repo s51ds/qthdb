@@ -1,6 +1,10 @@
 package log
 
-import "testing"
+import (
+	"github.com/s51ds/qthdb/row"
+	"reflect"
+	"testing"
+)
 
 func TestLineHasData(t *testing.T) {
 	type args struct {
@@ -267,6 +271,175 @@ func Test_dataLocatorsInputCase_loc2Only(t *testing.T) {
 			}
 			if got := d.loc2Only(); got != tt.want {
 				t.Errorf("loc2Only() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseN1mmCallHistoryLine(t *testing.T) {
+	recCallSignOnly, _ := row.MakeNewRecord("S51IV", "", "", "")
+
+	recloc1Only, _ := row.MakeNewRecord("S51IV", "JN76UP", "", "")
+	recloc2Only, _ := row.MakeNewRecord("S51IV", "JN76TO", "", "")
+	recloc1andLoc2, _ := row.MakeNewRecord("S51IV", "JN76UP", "", "")
+	_ = recloc1andLoc2.Update("JN76TO", "", "")
+	type args struct {
+		line string
+		sep  string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantRecord row.Record
+		wantErr    bool
+	}{
+		{
+			name: "loc1andLoc2-1",
+			args: args{
+				line: "S51IV,,JN76UP,JN76TO",
+				sep:  ",",
+			},
+			wantRecord: recloc1andLoc2,
+			wantErr:    false,
+		},
+		{
+			name: "loc1andLoc2-2",
+			args: args{
+				line: "S51IV,,JN76UP,JN76TO,",
+				sep:  ",",
+			},
+			wantRecord: recloc1andLoc2,
+			wantErr:    false,
+		},
+		{
+			name: "loc1andLoc2-3",
+			args: args{
+				line: "S51IV;;JN76UP;JN76TO;;;",
+				sep:  ";",
+			},
+			wantRecord: recloc1andLoc2,
+			wantErr:    false,
+		},
+
+		{
+			name: "loc1Only",
+			args: args{
+				line: "S51IV,,JN76UP,",
+				sep:  ",",
+			},
+			wantRecord: recloc1Only,
+			wantErr:    false,
+		},
+		{
+			name: "loc2Only",
+			args: args{
+				line: "S51IV,,,JN76TO",
+				sep:  ",",
+			},
+			wantRecord: recloc2Only,
+			wantErr:    false,
+		},
+		{
+			name: "S51IV-1",
+			args: args{
+				line: "S51IV",
+				sep:  ",",
+			},
+			wantRecord: recCallSignOnly,
+			wantErr:    false,
+		},
+		{
+			name: "S51IV-2",
+			args: args{
+				line: "S51IV;;;;;;;;;;;;;;;;;",
+				sep:  ";",
+			},
+			wantRecord: recCallSignOnly,
+			wantErr:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRecord, err := parseN1mmCallHistoryLine(tt.args.line, tt.args.sep)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseN1mmCallHistoryLine() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRecord, tt.wantRecord) {
+				t.Errorf("parseN1mmCallHistoryLine() gotRecord = %v, want %v", gotRecord, tt.wantRecord)
+			}
+		})
+	}
+}
+
+func Test_parseN1mmGenericFileLine(t *testing.T) {
+	//20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10
+	rec, _ := row.MakeNewRecord("S52ME", "JN76TM", "20200704", "1453")
+	type args struct {
+		line string
+		sep  string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantRecord row.Record
+		wantErr    bool
+	}{
+		{
+			name: "wrong line",
+			args: args{
+				line: "20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 ",
+				sep:  "",
+			},
+			wantRecord: row.Record{},
+			wantErr:    true,
+		},
+		{
+			name: "ok",
+			args: args{
+				line: "20200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
+				sep:  "",
+			},
+			wantRecord: rec,
+			wantErr:    false,
+		},
+		{
+			name: "err-1",
+			args: args{
+				line: "200704 1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
+				sep:  "",
+			},
+			wantRecord: row.Record{},
+			wantErr:    true,
+		},
+		{
+			name: "err-2",
+			args: args{
+				line: "200704 1453UTC   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
+				sep:  "",
+			},
+			wantRecord: row.Record{},
+			wantErr:    true,
+		},
+		{
+			name: "err-3",
+			args: args{
+				line: "200704;1453   144409,86  USB S59ABC         59 034 JN76TO  S52ME             59 001 JN76TM    10",
+				sep:  "",
+			},
+			wantRecord: row.Record{},
+			wantErr:    true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRecord, err := parseN1mmGenericFileLine(tt.args.line, tt.args.sep)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseN1mmGenericFileLine() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRecord, tt.wantRecord) {
+				t.Errorf("parseN1mmGenericFileLine() gotRecord = %v, want %v", gotRecord, tt.wantRecord)
 			}
 		})
 	}
