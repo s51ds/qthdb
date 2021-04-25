@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/s51ds/qthdb/timing"
 	"github.com/s51ds/validators/validate"
+	"sort"
 	"strings"
+	"time"
 )
 
 // empty is used in maps where only key has value
@@ -21,13 +23,55 @@ type Locator string
 // LocatorTimes has primary key LogTime
 type LocatorTimes map[timing.LogTime]empty
 
+func (t LocatorTimes) SortedByTime() []timing.LogTime {
+	logTimes := make([]timing.LogTime, len(t), len(t))
+	i := 0
+	for k := range t {
+		logTimes[i] = k
+		i++
+	}
+	sort.Sort(timing.ByTime(logTimes))
+	return logTimes
+}
+
 // Locators has primary key Locator, value is LocatorTimes
 type Locators map[Locator]LocatorTimes
+
+type QueryResponse struct {
+	Locator Locator
+	LogTime timing.LogTime
+}
+
+type LocatorWithLogTimes struct {
+	locator Locator
+	logTime []time.Time
+}
+
+func (l Locators) SortedByTime() (resp []QueryResponse) {
+	mainSlice := make([]LocatorWithLogTimes, 0, 10)
+	for k, v := range l {
+		lwt := LocatorWithLogTimes{}
+		lwt.locator = k
+		lwt.logTime = make([]time.Time, 0, 10)
+		for k1 := range v {
+			lwt.logTime = append(lwt.logTime, k1.Time())
+		}
+		mainSlice = append(mainSlice, lwt)
+	}
+	resp = make([]QueryResponse, 0, 10)
+	fmt.Println("test")
+
+	return
+}
 
 // Record consists from callSign associated with zero or more locators
 type Record struct {
 	callSign CallSign
 	locators Locators
+}
+
+func (r *Record) Locators() Locators {
+	return r.locators
 }
 
 //Merge merges new record n into existed record r. Returns error if r and n callSign is not the same
@@ -108,6 +152,11 @@ func (r *Record) Update(locator Locator, yyyymmdd, hhmm string) error {
 
 func (r *Record) CallSign() CallSign {
 	return r.callSign
+}
+
+// IsZero reports whether r has zero value
+func (r *Record) IsZero() bool {
+	return r.callSign == "" && r.locators == nil
 }
 
 func (r *Record) String() string {

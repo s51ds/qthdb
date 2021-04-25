@@ -31,6 +31,9 @@ func String() string {
 
 // Put creates or updates the record in the table if record already exists
 func Put(record row.Record) (err error) {
+	if record.IsZero() { // we never put empty record into db
+		return
+	}
 	callSign := record.CallSign()
 	if r, has := table.rows[callSign]; has {
 		err = r.Merge(record)
@@ -47,3 +50,14 @@ func Get(callSign row.CallSign) (record row.Record, found bool) {
 	record, found = table.rows[callSign]
 	return
 }
+
+//func GetLatest(callSign row.CallSign) string {
+//	if record, found := Get(callSign); found {
+//		locators := record.Locators()
+//		for loc, time := range locators {
+//
+//		}
+//	}
+//
+//	return ""
+//}

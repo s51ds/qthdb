@@ -2,6 +2,7 @@ package row
 
 import (
 	"fmt"
+	"github.com/s51ds/qthdb/timing"
 	"reflect"
 	"testing"
 )
@@ -344,4 +345,46 @@ func TestMakeNewRecord3(t *testing.T) {
 	if err := recMain.Update("JN76T9", "20210604", "1000"); err == nil {
 		t.Error("WTF-invalid locator not detected ")
 	}
+}
+
+func TestRecord_IsZero(t *testing.T) {
+	recZero := Record{}
+	recNonZero, _ := MakeNewRecord("s51ds", "", "", "")
+
+	if !recZero.IsZero() {
+		t.Error("WTF")
+	}
+	if recNonZero.IsZero() {
+		t.Error("WTF")
+	}
+
+}
+
+func TestLocatorTimes_SortedByTime(t *testing.T) {
+	lt1, _ := timing.MakeLogTime("", "")
+	lt2, _ := timing.MakeLogTime("19610904", "1111")
+	lt3, _ := timing.MakeLogTime("20200425", "1813")
+	lt4, _ := timing.MakeLogTime("20210425", "1820")
+	m := LocatorTimes{lt1: empty{}, lt2: empty{}, lt3: empty{}, lt4: empty{}}
+	sorted := m.SortedByTime()
+	for _, v := range sorted {
+		fmt.Println(v.Sprint(true))
+	}
+	fmt.Println()
+	for _, v := range sorted {
+		fmt.Println(v.String())
+	}
+}
+
+func TestLocators_SortedByTime(t *testing.T) {
+	rec, _ := MakeNewRecord("S59ABC", "", "", "")
+	_ = rec.Update("JN76TO", "", "")
+	_ = rec.Update("JN76PO", "", "")
+	_ = rec.Update("JN76TO", "20210304", "1000")
+	_ = rec.Update("JN76PO", "20210404", "1000")
+	_ = rec.Update("JN76TO", "20210504", "1001")
+	_ = rec.Update("JN76PO", "20210604", "1001")
+
+	locators := rec.Locators()
+	locators.SortedByTime()
 }
