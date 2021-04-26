@@ -2,6 +2,8 @@ package row
 
 import (
 	"fmt"
+	"github.com/s51ds/qthdb/timing"
+
 	//	"github.com/s51ds/qthdb/timing"
 	"reflect"
 	"testing"
@@ -360,31 +362,42 @@ func TestRecord_IsZero(t *testing.T) {
 
 }
 
-//func TestLocatorTimes_SortedByTime(t *testing.T) {
-//	lt1, _ := timing.MakeLogTime("", "")
-//	lt2, _ := timing.MakeLogTime("19610904", "1111")
-//	lt3, _ := timing.MakeLogTime("20200425", "1813")
-//	lt4, _ := timing.MakeLogTime("20210425", "1820")
-//	m := LocatorTimes{lt1: empty{}, lt2: empty{}, lt3: empty{}, lt4: empty{}}
-//	sorted := m.SortedByTime()
-//	for _, v := range sorted {
-//		fmt.Println(v.Sprint(true))
-//	}
-//	fmt.Println()
-//	for _, v := range sorted {
-//		fmt.Println(v.String())
-//	}
-//}
-//
-//func TestLocators_SortedByTime(t *testing.T) {
-//	rec, _ := MakeNewRecord("S59ABC", "", "", "")
-//	_ = rec.Update("JN76TO", "", "")
-//	_ = rec.Update("JN76PO", "", "")
-//	_ = rec.Update("JN76TO", "20210304", "1000")
-//	_ = rec.Update("JN76PO", "20210404", "1000")
-//	_ = rec.Update("JN76TO", "20210504", "1001")
-//	_ = rec.Update("JN76PO", "20210604", "1001")
-//
-//	locators := rec.Locators()
-//	locators.SortedByTime()
-//}
+func TestLocatorTimes_SortedByTime(t *testing.T) {
+	lt1, _ := timing.MakeLogTime("", "")
+	lt2, _ := timing.MakeLogTime("19610904", "1111")
+	lt3, _ := timing.MakeLogTime("20200425", "1813")
+	lt4, _ := timing.MakeLogTime("20210425", "1820")
+	m := LocatorTimes{lt1: empty{}, lt2: empty{}, lt3: empty{}, lt4: empty{}}
+	sorted := m.SortedByTime()
+	for _, v := range sorted {
+		fmt.Println(v.Sprint(true))
+	}
+	fmt.Println()
+	for _, v := range sorted {
+		fmt.Println(v.GetString())
+	}
+}
+
+func TestLocators_SortedByTime(t *testing.T) {
+	rec, _ := MakeNewRecord("S59ABC", "", "", "")
+	_ = rec.Update("JN76TO", "", "")
+	_ = rec.Update("JN76TO", "20210304", "1000")
+	_ = rec.Update("JN76PO", "20210404", "1000")
+	_ = rec.Update("JN76TO", "20210504", "1001")
+	_ = rec.Update("JN76PO", "20210604", "1001")
+	_ = rec.Update("JN76TO", "20210304", "1000")
+
+	locators := rec.Locators()
+	resp := locators.SortedByTime()
+	data := []string{
+		"JN76PO 2021-06-04 10:01:00 +0000 UTC",
+		"JN76TO 2021-05-04 10:01:00 +0000 UTC",
+		"JN76PO 2021-04-04 10:00:00 +0000 UTC",
+		"JN76TO 2021-03-04 10:00:00 +0000 UTC",
+		"JN76TO 0001-01-01 00:00:00 +0000 UTC"}
+	for i, v := range resp {
+		if v.String() != data[i] {
+			t.Error(fmt.Sprintf("want {%s}, got {%s}", data[i], v.String()))
+		}
+	}
+}

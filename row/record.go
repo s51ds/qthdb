@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/s51ds/qthdb/timing"
 	"github.com/s51ds/validators/validate"
-	"sort"
 	"strings"
 )
 
@@ -22,46 +21,8 @@ type Locator string
 // LocatorTimes has primary key LogTime
 type LocatorTimes map[timing.LogTime]empty
 
-func (t LocatorTimes) SortedByTime() []timing.LogTime {
-	logTimes := make([]timing.LogTime, len(t), len(t))
-	i := 0
-	for k := range t {
-		logTimes[i] = k
-		i++
-	}
-	sort.Sort(timing.ByTime(logTimes))
-	return logTimes
-}
-
 // Locators has primary key Locator, value is LocatorTimes
 type Locators map[Locator]LocatorTimes
-
-type QueryResponse struct {
-	Locator Locator
-	LogTime timing.LogTime
-}
-
-type LocatorWithLogTimes struct {
-	locator Locator
-	logTime []timing.LogTime
-}
-
-//func (l Locators) SortedByTime() (resp []QueryResponse) {
-//	mainSlice := make([]LocatorWithLogTimes, 0, 10)
-//	for k, v := range l {
-//		lwt := LocatorWithLogTimes{}
-//		lwt.locator = k
-//		lwt.logTime = make([]timing.LogTime, 0, 10)
-//		for k1 := range v {
-//			lwt.logTime = append(lwt.logTime, k1.Time())
-//		}
-//		mainSlice = append(mainSlice, lwt)
-//	}
-//	resp = make([]QueryResponse, 0, 10)
-//	fmt.Println("test")
-//
-//	return
-//}
 
 // Record consists from callSign associated with zero or more locators
 type Record struct {

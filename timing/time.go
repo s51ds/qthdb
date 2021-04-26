@@ -13,6 +13,10 @@ type LogTime struct {
 	loggedTime gotime.Time
 }
 
+func (t *LogTime) SetLoggedTime(loggedTime gotime.Time) {
+	t.loggedTime = loggedTime
+}
+
 // MakeLogTime parses yyyymmdd and hhmm and returns LogTime.
 // If both,yyyymmdd and hhmm are empty strings, LogTime Zero-Value is returned
 func MakeLogTime(yyyymmdd, hhmm string) (logTime LogTime, err error) {
