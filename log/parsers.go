@@ -9,14 +9,6 @@ import (
 	"strings"
 )
 
-type Type int
-
-const (
-	TypeN1mmCallHistory Type = iota
-	TypeN1mmGenericFile
-	TypeEdiFile
-)
-
 var regex, _ = regexp.Compile("^[a-zA-Z0-9]")
 
 func LineHasData(line string) bool {

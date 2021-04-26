@@ -29,6 +29,10 @@ func String() string {
 	return sb.String()
 }
 
+func NumberOfRows() int {
+	return len(table.rows)
+}
+
 // Put creates or updates the record in the table if record already exists
 func Put(record row.Record) (err error) {
 	if record.IsZero() { // we never put empty record into db
