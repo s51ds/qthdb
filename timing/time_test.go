@@ -24,7 +24,7 @@ func TestMakeLogTime(t *testing.T) {
 				hhmm:     "1520",
 			},
 			wantLogTime: LogTime{
-				time: time.Date(2020, 07, 04, 15, 20, 00, 00, time.UTC),
+				loggedTime: time.Date(2020, 07, 04, 15, 20, 00, 00, time.UTC),
 			},
 			wantErr: false,
 		},
@@ -35,7 +35,7 @@ func TestMakeLogTime(t *testing.T) {
 				hhmm:     "0000",
 			},
 			wantLogTime: LogTime{
-				time: time.Time{},
+				loggedTime: time.Time{},
 			},
 			wantErr: false,
 		},
@@ -46,7 +46,7 @@ func TestMakeLogTime(t *testing.T) {
 				hhmm:     "",
 			},
 			wantLogTime: LogTime{
-				time: time.Time{},
+				loggedTime: time.Time{},
 			},
 			wantErr: false,
 		},
@@ -57,7 +57,7 @@ func TestMakeLogTime(t *testing.T) {
 				hhmm:     "1",
 			},
 			wantLogTime: LogTime{
-				time: time.Time{},
+				loggedTime: time.Time{},
 			},
 			wantErr: true,
 		},
@@ -81,55 +81,54 @@ func TestLogTime_IsZero(t1 *testing.T) {
 	LT1, _ := MakeLogTime("20200704", "1402")
 
 	type fields struct {
-		Time time.Time
+		loggedTime time.Time
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		want   bool
 	}{
-
 		{
 			name: "zero-1",
 			fields: fields{
-				Time: time.Time{},
+				loggedTime: time.Time{},
 			},
 			want: true,
 		},
 		{
 			name: "zero-2",
 			fields: fields{
-				Time: LT0.Time(),
+				loggedTime: LT0.loggedTime,
 			},
 			want: true,
 		},
 		{
 			name: "no zero",
 			fields: fields{
-				Time: LT1.Time(),
+				loggedTime: LT1.loggedTime,
 			},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := LogTime{
-				time: tt.fields.Time,
+			t := &LogTime{
+				loggedTime: tt.fields.loggedTime,
 			}
-			if got := t.IsZero(); got != tt.want {
+			if got := t.IsLogTimeZero(); got != tt.want {
 				t1.Errorf("IsZero() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestLogTime_Unix(t1 *testing.T) {
+func TestLogTime_GetUnix(t1 *testing.T) {
 	LT0, _ := MakeLogTime("19700101", "0000")
 	LT1, _ := MakeLogTime("19610904", "0000")
 	LT2, _ := MakeLogTime("20210402", "1634")
 
 	type fields struct {
-		time time.Time
+		loggedTime time.Time
 	}
 	tests := []struct {
 		name   string
@@ -140,7 +139,7 @@ func TestLogTime_Unix(t1 *testing.T) {
 		{
 			name: "zeroValue",
 			fields: fields{
-				time: time.Time{},
+				loggedTime: time.Time{},
 			},
 			want: -62135596800, // January 1, year 1, 00:00:00 UTC.
 		},
@@ -148,45 +147,45 @@ func TestLogTime_Unix(t1 *testing.T) {
 		{
 			name: "unix-begin",
 			fields: fields{
-				time: LT0.Time(),
+				loggedTime: LT0.loggedTime,
 			},
 			want: 0, // January 1, year 1, 00:00:00 UTC.
 		},
 		{
 			name: "S51DS",
 			fields: fields{
-				time: LT1.Time(),
+				loggedTime: LT1.loggedTime,
 			},
 			want: -262742400, // September 4, year 1961, 16:34:00 UTC.
 		},
 		{
 			name: "WhenThisCodeWasWritten",
 			fields: fields{
-				time: LT2.Time(),
+				loggedTime: LT2.loggedTime,
 			},
 			want: 1617381240, // April 2, year 2021, 00:00:00 UTC.
 		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := LogTime{
-				time: tt.fields.time,
+			t := &LogTime{
+				loggedTime: tt.fields.loggedTime,
 			}
-			if got := t.Unix(); got != tt.want {
-				t1.Errorf("Unix() = %v, want %v", got, tt.want)
+			if got := t.GetUnix(); got != tt.want {
+				t1.Errorf("GetUnix() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestLogTime_Month(t1 *testing.T) {
+func TestLogTime_GetMonth(t1 *testing.T) {
 	LT0, _ := MakeLogTime("19700101", "0000")
 	LT1, _ := MakeLogTime("19610904", "0000")
 	LT2, _ := MakeLogTime("20210402", "1634")
 	LT3, _ := MakeLogTime("20211231", "2359")
 
 	type fields struct {
-		time time.Time
+		loggedTime time.Time
 	}
 	tests := []struct {
 		name   string
@@ -195,54 +194,62 @@ func TestLogTime_Month(t1 *testing.T) {
 	}{
 
 		{
+			name: "zero",
+			fields: fields{
+				loggedTime: time.Time{},
+			},
+			want: "JAN",
+		},
+
+		{
 			name: "unix-begin",
 			fields: fields{
-				time: LT0.Time(),
+				loggedTime: LT0.loggedTime,
 			},
 			want: "JAN", // January 1, year 1, 00:00:00 UTC.
 		},
 		{
 			name: "S51DS",
 			fields: fields{
-				time: LT1.Time(),
+				loggedTime: LT1.loggedTime,
 			},
 			want: "SEP", // September 4, year 1961, 16:34:00 UTC.
 		},
 		{
 			name: "WhenThisCodeWasWritten",
 			fields: fields{
-				time: LT2.Time(),
+				loggedTime: LT2.loggedTime,
 			},
 			want: "APR", // April 2, year 2021, 00:00:00 UTC.
 		},
 		{
 			name: "HappyNewYear",
 			fields: fields{
-				time: LT3.Time(),
+				loggedTime: LT3.loggedTime,
 			},
 			want: "DEC", // December 31, year 2021, 23:59:00 UTC.
 		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := LogTime{
-				time: tt.fields.time,
+			t := &LogTime{
+				loggedTime: tt.fields.loggedTime,
 			}
-			if got := t.Month(); got != tt.want {
-				t1.Errorf("Month() = %v, want %v", got, tt.want)
+			if got := t.GetMonth(); got != tt.want {
+				t1.Errorf("GetMonth() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestLogTime_Year(t1 *testing.T) {
+func TestLogTime_GetYear(t1 *testing.T) {
 	LT0, _ := MakeLogTime("19700101", "0000")
 	LT1, _ := MakeLogTime("19610904", "0000")
 	LT2, _ := MakeLogTime("20210402", "1634")
 	LT3, _ := MakeLogTime("20211231", "2359")
 
 	type fields struct {
-		time time.Time
+		loggedTime time.Time
 	}
 	tests := []struct {
 		name   string
@@ -252,28 +259,28 @@ func TestLogTime_Year(t1 *testing.T) {
 		{
 			name: "unix-begin",
 			fields: fields{
-				time: LT0.Time(),
+				loggedTime: LT0.loggedTime,
 			},
 			want: "1970", // January 1, year 1970, 00:00:00 UTC.
 		},
 		{
 			name: "S51DS",
 			fields: fields{
-				time: LT1.Time(),
+				loggedTime: LT1.loggedTime,
 			},
 			want: "1961", // September 4, year 1961, 16:34:00 UTC.
 		},
 		{
 			name: "WhenThisCodeWasWritten",
 			fields: fields{
-				time: LT2.Time(),
+				loggedTime: LT2.loggedTime,
 			},
 			want: "2021", // April 2, year 2021, 00:00:00 UTC.
 		},
 		{
 			name: "HappyNewYear",
 			fields: fields{
-				time: LT3.Time(),
+				loggedTime: LT3.loggedTime,
 			},
 			want: "2021", // December 31, year 2021, 23:59:00 UTC.
 		},
@@ -285,27 +292,26 @@ func TestLogTime_Year(t1 *testing.T) {
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := LogTime{
-				time: tt.fields.time,
+			t := &LogTime{
+				loggedTime: tt.fields.loggedTime,
 			}
-			if got := t.Year(); got != tt.want {
-				t1.Errorf("Year() = %v, want %v", got, tt.want)
+			if got := t.GetYear(); got != tt.want {
+				t1.Errorf("GetYear() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestLogTime_String(t1 *testing.T) {
+func TestLogTime_GetString(t1 *testing.T) {
 	lt, err := MakeLogTime("20210403", "1514")
 	if err != nil {
 		t1.Error(err.Error())
 	} else {
 		want := "2021-04-03 15:14:00 +0000 UTC"
-		if lt.String() != want {
-			t1.Errorf("want:[%s], got:[%s]", want, lt.String())
+		if lt.GetString() != want {
+			t1.Errorf("want:[%s], got:[%s]", want, lt.GetString())
 		}
 	}
-
 }
 
 func TestFourDigitsYear(t *testing.T) {
@@ -371,13 +377,70 @@ func TestFourDigitsYear(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotYyyy, err := FourDigitsYear(tt.args.yy)
+			gotYyyymmdd, err := FourDigitsYear(tt.args.yy)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FourDigitsYear() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if gotYyyy != tt.wantYyyy {
-				t.Errorf("FourDigitsYear() gotYyyy = %v, want %v", gotYyyy, tt.wantYyyy)
+			if gotYyyymmdd != tt.wantYyyy {
+				t.Errorf("FourDigitsYear() gotYyyymmdd = %v, want %v", gotYyyymmdd, tt.wantYyyy)
+			}
+		})
+	}
+}
+
+func TestLogTime_Sprint(t1 *testing.T) {
+	type fields struct {
+		loggedTime time.Time
+	}
+	type args struct {
+		hint bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
+
+		{
+			name: "zero",
+			fields: fields{
+				loggedTime: time.Time{},
+			},
+			args: args{
+				hint: false,
+			},
+			want: "",
+		},
+		{
+			name: "JUL 2020",
+			fields: fields{
+				loggedTime: time.Date(2020, 07, 04, 15, 20, 00, 00, time.UTC),
+			},
+			args: args{
+				hint: false,
+			},
+			want: "JUL 2020",
+		},
+		{
+			name: "APR 2020",
+			fields: fields{
+				loggedTime: time.Date(2020, 04, 04, 15, 20, 00, 00, time.UTC),
+			},
+			args: args{
+				hint: false,
+			},
+			want: "APR 2020",
+		},
+	}
+	for _, tt := range tests {
+		t1.Run(tt.name, func(t1 *testing.T) {
+			t := &LogTime{
+				loggedTime: tt.fields.loggedTime,
+			}
+			if got := t.Sprint(tt.args.hint); got != tt.want {
+				t1.Errorf("Sprint() = %v, want %v", got, tt.want)
 			}
 		})
 	}

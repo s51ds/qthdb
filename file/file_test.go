@@ -1,4 +1,4 @@
-package qthdb
+package file
 
 import (
 	"fmt"

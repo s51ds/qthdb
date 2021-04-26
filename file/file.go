@@ -1,4 +1,4 @@
-package qthdb
+package file
 
 import (
 	"github.com/s51ds/qthdb/db"

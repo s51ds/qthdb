@@ -8,7 +8,6 @@ import (
 	"github.com/s51ds/validators/validate"
 	"sort"
 	"strings"
-	"time"
 )
 
 // empty is used in maps where only key has value
@@ -44,25 +43,25 @@ type QueryResponse struct {
 
 type LocatorWithLogTimes struct {
 	locator Locator
-	logTime []time.Time
+	logTime []timing.LogTime
 }
 
-func (l Locators) SortedByTime() (resp []QueryResponse) {
-	mainSlice := make([]LocatorWithLogTimes, 0, 10)
-	for k, v := range l {
-		lwt := LocatorWithLogTimes{}
-		lwt.locator = k
-		lwt.logTime = make([]time.Time, 0, 10)
-		for k1 := range v {
-			lwt.logTime = append(lwt.logTime, k1.Time())
-		}
-		mainSlice = append(mainSlice, lwt)
-	}
-	resp = make([]QueryResponse, 0, 10)
-	fmt.Println("test")
-
-	return
-}
+//func (l Locators) SortedByTime() (resp []QueryResponse) {
+//	mainSlice := make([]LocatorWithLogTimes, 0, 10)
+//	for k, v := range l {
+//		lwt := LocatorWithLogTimes{}
+//		lwt.locator = k
+//		lwt.logTime = make([]timing.LogTime, 0, 10)
+//		for k1 := range v {
+//			lwt.logTime = append(lwt.logTime, k1.Time())
+//		}
+//		mainSlice = append(mainSlice, lwt)
+//	}
+//	resp = make([]QueryResponse, 0, 10)
+//	fmt.Println("test")
+//
+//	return
+//}
 
 // Record consists from callSign associated with zero or more locators
 type Record struct {
@@ -166,7 +165,7 @@ func (r *Record) String() string {
 	for k0, v0 := range r.locators {
 		sb.WriteString(fmt.Sprintf("%s:[", string(k0)))
 		for k1 := range v0 {
-			sb.WriteString(fmt.Sprintf("%s, ", k1.String()))
+			sb.WriteString(fmt.Sprintf("%s, ", k1.GetString()))
 		}
 		sb.WriteString("],")
 	}
