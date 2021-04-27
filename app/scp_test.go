@@ -5,6 +5,7 @@ import (
 	"github.com/s51ds/qthdb/db"
 	"github.com/s51ds/qthdb/log"
 	"testing"
+	"time"
 )
 
 func TestGetAll(t *testing.T) {
@@ -80,4 +81,29 @@ func TestSprintScpFormat(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMakeN1mmScpFile(t *testing.T) {
+	db.Clear()
+	if err := InsertLog("./testdata/S59ABC-NOV2020.edi", log.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	if db.NumberOfRows() != 205 {
+		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 205, db.NumberOfRows()))
+	}
+
+	if err := InsertLog("./testdata/S59ABC-MAR2021.edi", log.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	if db.NumberOfRows() != 413 {
+		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 413, db.NumberOfRows()))
+	}
+
+	if err := InsertLog("./testdata/fake.edi", log.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	_ = MakeN1mmScpFile(time.March)
+
+	db.Clear()
 }
