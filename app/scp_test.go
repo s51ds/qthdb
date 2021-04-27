@@ -103,7 +103,7 @@ func TestMakeN1mmScpFile(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 
-	_ = MakeN1mmScpFile(time.March)
+	_ = MakeN1mmScpFile(time.May)
 
 	db.Clear()
 }

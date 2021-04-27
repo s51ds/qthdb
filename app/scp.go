@@ -50,18 +50,35 @@ func MakeN1mmScpFile(month time.Month) error {
 				// looking for latest locator which is different than loc1
 				//
 				// first look the Month of contest
-
-				for i, v := range resp {
-
-					if i == 0 {
-						// skip
+				monthFound := false
+				if month != 0 {
+					for i, v := range resp {
+						if i == 0 {
+							// skip, loc1 is already set
+						}
+						if loc1 != string(v.Locator) && v.LogTime.LoggedTime().Month() == month {
+							// found
+							monthFound = true
+							loc2 = string(v.Locator)
+							break
+						}
 					}
-					if loc1 != string(v.Locator) {
-						// found
-						loc2 = string(v.Locator)
-						break
-					}
+
 				}
+				if !monthFound {
+					for i, v := range resp {
+						if i == 0 {
+							// skip, loc1 is already set
+						}
+						if loc1 != string(v.Locator) {
+							// found
+							loc2 = string(v.Locator)
+							break
+						}
+					}
+
+				}
+
 			}
 		}
 		if loc1 == loc2 {
