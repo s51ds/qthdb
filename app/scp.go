@@ -14,7 +14,7 @@ func sPrintN1mmScpFormat(callSign, loc1, loc2 string) string {
 	return fmt.Sprintf("%s,,%s,%s", callSign, loc1, loc2)
 }
 
-func MakeN1mmScpFile(month time.Month) error {
+func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	if month < 0 || month > 12 {
 		return errors.New(fmt.Sprintf("invalid Month:%d", month))
 	}

@@ -83,7 +83,7 @@ func TestSprintScpFormat(t *testing.T) {
 	}
 }
 
-func TestMakeN1mmScpFile(t *testing.T) {
+func TestMakeN1mmScpFile1(t *testing.T) {
 	db.Clear()
 	if err := InsertLog("./testdata/S59ABC-NOV2020.edi", log.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
@@ -103,7 +103,26 @@ func TestMakeN1mmScpFile(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 
-	_ = MakeN1mmScpFile(time.May)
+	_ = MakeN1mmScpFile("./testdata/test.scp", time.May)
+
+	db.Clear()
+}
+
+func TestMakeN1mmScpFile2(t *testing.T) {
+	db.Clear()
+	if err := InsertLog("./testdata/fake.edi", log.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	_ = MakeN1mmScpFile("./testdata/test.scp", time.March)
+	_ = MakeN1mmScpFile("./testdata/test.scp", time.May)
+	_ = MakeN1mmScpFile("./testdata/test.scp", time.September)
+	_ = MakeN1mmScpFile("./testdata/test.scp", 0)
+	if err := MakeN1mmScpFile("./testdata/test.scp", -1); err == nil {
+		t.Errorf("WTF, nil=")
+	}
+	if err := MakeN1mmScpFile("./testdata/test.scp", 13); err == nil {
+		t.Errorf("WTF, nil=")
+	}
 
 	db.Clear()
 }
