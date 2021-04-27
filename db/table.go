@@ -55,13 +55,17 @@ func Get(callSign row.CallSign) (record row.Record, found bool) {
 	return
 }
 
-//func GetLatest(callSign row.CallSign) string {
-//	if record, found := Get(callSign); found {
-//		locators := record.Locators()
-//		for loc, time := range locators {
-//
-//		}
-//	}
-//
-//	return ""
-//}
+func GetAll() []row.Record {
+	ret := make([]row.Record, len(table.rows), len(table.rows))
+	i := 0
+	for _, v := range table.rows {
+		ret[i] = v
+		i++
+	}
+	return ret
+}
+
+// Clear removes all records from DB
+func Clear() {
+	table.rows = make(map[row.CallSign]row.Record)
+}
