@@ -18,6 +18,15 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	if month < 0 || month > 12 {
 		return errors.New(fmt.Sprintf("invalid Month:%d", month))
 	}
+
+	scpFile, err := os.Create(scpFileName)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = scpFile.Close()
+	}()
+
 	scpLines := make([]string, 0, 10000)
 	rows := db.GetAll()
 	for _, r := range rows {
@@ -89,8 +98,11 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 		scpLines = append(scpLines, s)
 	}
 	sort.Strings(scpLines)
-	for i, v := range scpLines {
-		fmt.Println(i, v)
+	for _, v := range scpLines {
+		if _, err := scpFile.WriteString(v + "\n"); err != nil {
+			//			fmt.Println(err.Error())
+		}
+		//		fmt.Println(i, v)
 	}
 	return nil
 }
