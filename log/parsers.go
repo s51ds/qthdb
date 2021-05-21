@@ -11,6 +11,7 @@ import (
 
 var regex, _ = regexp.Compile("^[a-zA-Z0-9]")
 
+// LineHasData returns false if line is comment, empty ...
 func LineHasData(line string) bool {
 	return regex.MatchString(line)
 }
@@ -28,7 +29,7 @@ func DetectSeparator(line string) string {
 
 func Parse(logType Type, line string) (record row.Record, err error) {
 	if !LineHasData(line) {
-		return record, err // no error, just skip the line
+		return record, err // nil error, just skip the line
 	}
 	switch logType {
 	case TypeN1mmCallHistory:
