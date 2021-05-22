@@ -100,9 +100,7 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	sort.Strings(scpLines)
 	for _, v := range scpLines {
 		if _, err := scpFile.WriteString(v + "\n"); err != nil {
-			//			fmt.Println(err.Error())
 		}
-		//		fmt.Println(i, v)
 	}
 	return nil
 }

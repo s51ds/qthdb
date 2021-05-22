@@ -24,6 +24,15 @@ type LocatorTimes map[timing.LogTime]empty
 // Locators has primary key Locator, value is LocatorTimes
 type Locators map[Locator]LocatorTimes
 
+func (l Locators) StringLocators() string {
+	sb := strings.Builder{}
+	for k := range l {
+		sb.WriteString(string(k))
+		sb.WriteString(" ")
+	}
+	return sb.String()
+}
+
 // Record consists from callSign associated with zero or more locators
 type Record struct {
 	callSign CallSign

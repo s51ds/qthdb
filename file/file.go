@@ -10,9 +10,9 @@ import (
 	"strings"
 )
 
-// openFile is just a wrapper around os.Open. It returns err if
+// Open is just a wrapper around os.Open. It returns err if
 // file does not exist included info about working directory
-func openFile(fileName string) (file *os.File, err error) {
+func Open(fileName string) (file *os.File, err error) {
 	file, err = os.Open(fileName)
 	if err != nil {
 		wd, _ := os.Getwd()
@@ -30,7 +30,7 @@ func openFile(fileName string) (file *os.File, err error) {
 // line fields). In such case, error is logged to stdOut, nothing is put into db
 // but file parsing is continued until the end of file
 func InsertLog(fileName string, logType hamLog.Type) error {
-	file, err := openFile(fileName)
+	file, err := Open(fileName)
 	if err != nil {
 		return err
 	}
