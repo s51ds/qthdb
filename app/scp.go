@@ -30,7 +30,7 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	scpLines := make([]string, 0, 10000)
 	rows := db.GetAll()
 	for _, r := range rows {
-		callSign := string(r.CallSign)
+		callSign := r.CallSign
 		var loc1, loc2 string
 		resp := r.Locators.SortedByTime()
 		switch len(resp) {
@@ -40,12 +40,12 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 			}
 		case 1:
 			{
-				loc1 = string(resp[0].Locator)
+				loc1 = resp[0].Locator
 			}
 		case 2:
 			{
-				loc1 = string(resp[0].Locator)
-				loc2 = string(resp[1].Locator)
+				loc1 = resp[0].Locator
+				loc2 = resp[1].Locator
 				if loc1 == loc2 { // same locator
 					loc2 = ""
 				}

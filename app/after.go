@@ -63,6 +63,14 @@ func (d *data) String() string {
 	return d.callSign + " " + d.locators
 }
 
+func recData(rec row.Record) data {
+	d := data{
+		callSign: rec.CallSign,
+		locators: rec.Locators.SprintLocators(),
+	}
+	return d
+}
+
 func readData(fileName string, logType hamLog.Type) (resp []data, err error) {
 	f, err := file.Open(fileName)
 	if err != nil {
@@ -133,12 +141,4 @@ func readData(fileName string, logType hamLog.Type) (resp []data, err error) {
 
 	return
 
-}
-
-func recData(rec row.Record) data {
-	d := data{
-		callSign: string(rec.CallSign),
-		locators: rec.Locators.StringLocators(),
-	}
-	return d
 }

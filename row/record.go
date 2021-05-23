@@ -18,8 +18,8 @@ type LocatorTimes map[timing.LogTime]empty
 // LocatorsMap has key Locator, value is LocatorTimes
 type LocatorsMap map[string]LocatorTimes
 
-// StringLocators returns all Locators separated with space
-func (l LocatorsMap) StringLocators() string {
+// SprintLocators returns all Locators separated with space
+func (l LocatorsMap) SprintLocators() string {
 	sb := strings.Builder{}
 	for k := range l {
 		sb.WriteString(k)
