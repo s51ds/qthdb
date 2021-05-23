@@ -45,7 +45,7 @@ func Persists() {
 				fmt.Println("Persists()", err.Error())
 			}
 		}()
-		if err = encoder.Encode(table); err != nil {
+		if err = encoder.Encode(&table); err != nil {
 			fmt.Println("Persists()", err.Error())
 		}
 	}
