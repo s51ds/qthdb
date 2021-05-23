@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/s51ds/qthdb/timing"
+	"github.com/s51ds/validators/validate"
 	"strings"
 )
 
@@ -23,13 +24,26 @@ type LocatorTimes map[timing.LogTime]empty
 // Locators has primary key Locator, value is LocatorTimes
 type Locators map[Locator]LocatorTimes
 
+func (l Locators) StringLocators() string {
+	sb := strings.Builder{}
+	for k := range l {
+		sb.WriteString(string(k))
+		sb.WriteString(" ")
+	}
+	return sb.String()
+}
+
 // Record consists from callSign associated with zero or more locators
 type Record struct {
 	callSign CallSign
 	locators Locators
 }
 
-//Merge merges r in n. Returns error if r and n callSign is not the same
+func (r *Record) Locators() Locators {
+	return r.locators
+}
+
+//Merge merges new record n into existed record r. Returns error if r and n callSign is not the same
 func (r *Record) Merge(n Record) error {
 	if r.callSign != n.callSign {
 		return errors.New(fmt.Sprintf("n callSign:%s is not the same as in current record: %s", n.callSign, r.callSign))
@@ -53,14 +67,21 @@ func (r *Record) Merge(n Record) error {
 // If locator is not empty than the last two can be empty. If they are not, the syntax check is strict,
 // and an error can be returned.
 func MakeNewRecord(callSign CallSign, locator Locator, yyyymmdd, hhmm string) (Record, error) {
+	callSign = CallSign(strings.ToUpper(string(callSign)))
 	if callSign == "" {
 		return Record{}, errors.New("callSign is empty")
+	}
+	if !validate.CallSign(string(callSign)) {
+		return Record{}, errors.New(fmt.Sprintf("callSign:%s is not valid", callSign))
 	}
 	logTime, err := timing.MakeLogTime(yyyymmdd, hhmm)
 	if err != nil {
 		return Record{}, err
 	}
 	if locator != "" {
+		if !validate.Locator(string(locator)) {
+			return Record{}, errors.New(fmt.Sprintf("locator:%s is not valid", locator))
+		}
 		locatorsWithTime := make(LocatorTimes)
 		locatorsWithTime[logTime] = empty{}
 
@@ -80,6 +101,10 @@ func (r *Record) Update(locator Locator, yyyymmdd, hhmm string) error {
 	if locator == "" {
 		return errors.New("locator is empty")
 	}
+	if !validate.Locator(string(locator)) {
+		return errors.New(fmt.Sprintf("locator:%s is not valid", locator))
+	}
+
 	logTime, err := timing.MakeLogTime(yyyymmdd, hhmm)
 	if err != nil {
 		return err
@@ -98,6 +123,11 @@ func (r *Record) CallSign() CallSign {
 	return r.callSign
 }
 
+// IsZero reports whether r has zero value
+func (r *Record) IsZero() bool {
+	return r.callSign == "" && r.locators == nil
+}
+
 func (r *Record) String() string {
 	sb := strings.Builder{}
 	sb.WriteString("Record{")
@@ -105,7 +135,7 @@ func (r *Record) String() string {
 	for k0, v0 := range r.locators {
 		sb.WriteString(fmt.Sprintf("%s:[", string(k0)))
 		for k1 := range v0 {
-			sb.WriteString(fmt.Sprintf("%s, ", k1.String()))
+			sb.WriteString(fmt.Sprintf("%s, ", k1.GetString()))
 		}
 		sb.WriteString("],")
 	}

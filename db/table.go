@@ -29,7 +29,15 @@ func String() string {
 	return sb.String()
 }
 
-func Update(record row.Record) (err error) {
+func NumberOfRows() int {
+	return len(table.rows)
+}
+
+// Put creates or updates the record in the table if record already exists
+func Put(record row.Record) (err error) {
+	if record.IsZero() { // we never put empty record into db
+		return
+	}
 	callSign := record.CallSign()
 	if r, has := table.rows[callSign]; has {
 		err = r.Merge(record)
@@ -39,6 +47,25 @@ func Update(record row.Record) (err error) {
 	return err
 }
 
-func Get(callSign row.CallSign) row.Record {
-	return table.rows[callSign]
+// Get returns record and true if record for callSign exists in the table
+// otherwise zero value record and false is returned.
+func Get(callSign row.CallSign) (record row.Record, found bool) {
+	callSign = row.CallSign(strings.ToUpper(string(callSign)))
+	record, found = table.rows[callSign]
+	return
+}
+
+func GetAll() []row.Record {
+	ret := make([]row.Record, len(table.rows), len(table.rows))
+	i := 0
+	for _, v := range table.rows {
+		ret[i] = v
+		i++
+	}
+	return ret
+}
+
+// Clear removes all records from DB
+func Clear() {
+	table.rows = make(map[row.CallSign]row.Record)
 }

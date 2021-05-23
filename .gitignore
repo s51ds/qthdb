@@ -25,3 +25,5 @@ gen
 /out/
 
 *.bak
+*.scp
+*/scp/*
