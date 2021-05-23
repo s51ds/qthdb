@@ -12,19 +12,20 @@ import (
 // empty is used in maps where only key has value
 type empty struct{}
 
-// CallSign is just a string
-type CallSign string
+// CallSignString is just a string
+// type CallSignString string
 
-// Locator is just a string
-type Locator string
+// LocatorString is just a string
+type LocatorString string
 
 // LocatorTimes has primary key LogTime
 type LocatorTimes map[timing.LogTime]empty
 
-// Locators has primary key Locator, value is LocatorTimes
-type Locators map[Locator]LocatorTimes
+// LocatorsMap has primary key LocatorString, value is LocatorTimes
+type LocatorsMap map[LocatorString]LocatorTimes
 
-func (l Locators) StringLocators() string {
+// StringLocators returns all locators separated with space
+func (l LocatorsMap) StringLocators() string {
 	sb := strings.Builder{}
 	for k := range l {
 		sb.WriteString(string(k))
@@ -33,20 +34,20 @@ func (l Locators) StringLocators() string {
 	return sb.String()
 }
 
-// Record consists from callSign associated with zero or more locators
+// Record consists from CallSign associated with zero or more locators
 type Record struct {
-	callSign CallSign
-	locators Locators
+	CallSign string
+	locators LocatorsMap
 }
 
-func (r *Record) Locators() Locators {
+func (r *Record) Locators() LocatorsMap {
 	return r.locators
 }
 
-//Merge merges new record n into existed record r. Returns error if r and n callSign is not the same
+//Merge merges new record n into existed record r. Returns error if r and n CallSign is not the same
 func (r *Record) Merge(n Record) error {
-	if r.callSign != n.callSign {
-		return errors.New(fmt.Sprintf("n callSign:%s is not the same as in current record: %s", n.callSign, r.callSign))
+	if r.CallSign != n.CallSign {
+		return errors.New(fmt.Sprintf("n CallSign:%s is not the same as in current record: %s", n.CallSign, r.CallSign))
 	}
 
 	for kNLocator, vNLocatorTimes := range n.locators {
@@ -63,16 +64,16 @@ func (r *Record) Merge(n Record) error {
 	return nil
 }
 
-// MakeNewRecord returns new record, callSign is mandatory, others params can be empty strings.
+// MakeNewRecord returns new record, CallSign is mandatory, others params can be empty strings.
 // If locator is not empty than the last two can be empty. If they are not, the syntax check is strict,
 // and an error can be returned.
-func MakeNewRecord(callSign CallSign, locator Locator, yyyymmdd, hhmm string) (Record, error) {
-	callSign = CallSign(strings.ToUpper(string(callSign)))
+func MakeNewRecord(callSign string, locator LocatorString, yyyymmdd, hhmm string) (Record, error) {
+	callSign = strings.ToUpper(string(callSign))
 	if callSign == "" {
-		return Record{}, errors.New("callSign is empty")
+		return Record{}, errors.New("CallSign is empty")
 	}
-	if !validate.CallSign(string(callSign)) {
-		return Record{}, errors.New(fmt.Sprintf("callSign:%s is not valid", callSign))
+	if !validate.CallSign(callSign) {
+		return Record{}, errors.New(fmt.Sprintf("CallSign:%s is not valid", callSign))
 	}
 	logTime, err := timing.MakeLogTime(yyyymmdd, hhmm)
 	if err != nil {
@@ -85,11 +86,11 @@ func MakeNewRecord(callSign CallSign, locator Locator, yyyymmdd, hhmm string) (R
 		locatorsWithTime := make(LocatorTimes)
 		locatorsWithTime[logTime] = empty{}
 
-		locators := make(Locators)
+		locators := make(LocatorsMap)
 		locators[locator] = locatorsWithTime
-		return Record{callSign: callSign, locators: locators}, nil
+		return Record{CallSign: callSign, locators: locators}, nil
 	} else { // no locator
-		return Record{callSign: callSign, locators: Locators{}}, nil
+		return Record{CallSign: callSign, locators: LocatorsMap{}}, nil
 	}
 }
 
@@ -97,7 +98,7 @@ func MakeNewRecord(callSign CallSign, locator Locator, yyyymmdd, hhmm string) (R
 // data.
 // If yyyymmdd and hhmm are not empty strings, the syntax check is strict,
 // error can be returned
-func (r *Record) Update(locator Locator, yyyymmdd, hhmm string) error {
+func (r *Record) Update(locator LocatorString, yyyymmdd, hhmm string) error {
 	if locator == "" {
 		return errors.New("locator is empty")
 	}
@@ -119,19 +120,15 @@ func (r *Record) Update(locator Locator, yyyymmdd, hhmm string) error {
 	return nil
 }
 
-func (r *Record) CallSign() CallSign {
-	return r.callSign
-}
-
 // IsZero reports whether r has zero value
 func (r *Record) IsZero() bool {
-	return r.callSign == "" && r.locators == nil
+	return r.CallSign == "" && r.locators == nil
 }
 
 func (r *Record) String() string {
 	sb := strings.Builder{}
 	sb.WriteString("Record{")
-	sb.WriteString(fmt.Sprintf("callSign:%s, locators[", r.callSign))
+	sb.WriteString(fmt.Sprintf("CallSign:%s, locators[", r.CallSign))
 	for k0, v0 := range r.locators {
 		sb.WriteString(fmt.Sprintf("%s:[", string(k0)))
 		for k1 := range v0 {

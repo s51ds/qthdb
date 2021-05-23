@@ -28,12 +28,12 @@ func (t LocatorTimes) SortedByTime() []timing.LogTime {
 }
 
 type LocatorWithLogTimes struct {
-	locator Locator
+	locator LocatorString
 	logTime []timing.LogTime
 }
 
 type QueryResponse struct {
-	Locator Locator
+	Locator LocatorString
 	LogTime timing.LogTime
 }
 
@@ -41,7 +41,7 @@ func (q *QueryResponse) String() string {
 	return string(q.Locator) + " " + q.LogTime.GetString()
 }
 
-func (l Locators) SortedByTime() (resp []QueryResponse) {
+func (l LocatorsMap) SortedByTime() (resp []QueryResponse) {
 	mainSlice := make([]LocatorWithLogTimes, 0, 10)
 	for k, v := range l {
 		lwt := LocatorWithLogTimes{}

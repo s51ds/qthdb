@@ -29,17 +29,17 @@ func TestTable_UpdateGetAndString(t1 *testing.T) {
 
 	r, _ := Get("S51DS")
 	fmt.Println(r.String())
-	if r.CallSign() != "S51DS" {
-		t1.Error(`r.CallSign() != "S51DS"`)
+	if r.CallSign != "S51DS" {
+		t1.Error(`r.CallSignString() != "S51DS"`)
 	}
 	r, _ = Get("S59ABC")
-	if r.CallSign() != "S59ABC" {
-		t1.Error(`r.CallSign() != "S59ABC"`)
+	if r.CallSign != "S59ABC" {
+		t1.Error(`r.CallSignString() != "S59ABC"`)
 	}
 	fmt.Println(r.String())
 	r, _ = Get("S51AE")
-	if r.CallSign() != "" {
-		t1.Error(`r.CallSign() != ""`)
+	if r.CallSign != "" {
+		t1.Error(`r.CallSignString() != ""`)
 	}
 	fmt.Println(r.String())
 
@@ -55,7 +55,7 @@ func TestGet(t *testing.T) {
 	rec, _ = Get("S59ABC")
 
 	type args struct {
-		callSign row.CallSign
+		callSign string
 	}
 	tests := []struct {
 		name       string

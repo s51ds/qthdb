@@ -30,7 +30,7 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	scpLines := make([]string, 0, 10000)
 	rows := db.GetAll()
 	for _, r := range rows {
-		callSign := string(r.CallSign())
+		callSign := string(r.CallSign)
 		var loc1, loc2 string
 		resp := r.Locators().SortedByTime()
 		switch len(resp) {

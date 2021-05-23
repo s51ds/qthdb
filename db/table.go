@@ -13,24 +13,24 @@ var table Table
 
 func init() {
 	table = Table{}
-	table.Rows = make(map[row.CallSign]row.Record)
+	table.Rows = make(map[string]row.Record)
 
-	// try to load from disk
-	if file, err := os.Open("./db.gob"); err != nil {
-		fmt.Println("init()", err.Error())
-	} else {
-		decoder := gob.NewDecoder(file)
-		defer func() {
-			if err = file.Close(); err != nil {
-				fmt.Println("init()", err.Error())
-			}
-		}()
-		if err = decoder.Decode(&table); err != nil {
-			fmt.Println("init()", err.Error())
-		} else {
-			fmt.Println("db load from disk, file=" + file.Name())
-		}
-	}
+	//// try to load from disk
+	//if file, err := os.Open("./db.gob"); err != nil {
+	//	fmt.Println("init()", err.Error())
+	//} else {
+	//	decoder := gob.NewDecoder(file)
+	//	defer func() {
+	//		if err = file.Close(); err != nil {
+	//			fmt.Println("init()", err.Error())
+	//		}
+	//	}()
+	//	if err = decoder.Decode(&table); err != nil {
+	//		fmt.Println("init()", err.Error())
+	//	} else {
+	//		fmt.Println("db load from disk, file=" + file.Name())
+	//	}
+	//}
 
 }
 
@@ -53,7 +53,7 @@ func Persists() {
 
 // Table has primary key CallSign
 type Table struct {
-	Rows map[row.CallSign]row.Record
+	Rows map[string]row.Record
 }
 
 func String() string {
@@ -75,7 +75,7 @@ func Put(record row.Record) (err error) {
 	if record.IsZero() { // we never put empty record into db
 		return
 	}
-	callSign := record.CallSign()
+	callSign := record.CallSign
 	if r, has := table.Rows[callSign]; has {
 		err = r.Merge(record)
 	} else {
@@ -86,8 +86,8 @@ func Put(record row.Record) (err error) {
 
 // Get returns record and true if record for callSign exists in the table
 // otherwise zero value record and false is returned.
-func Get(callSign row.CallSign) (record row.Record, found bool) {
-	callSign = row.CallSign(strings.ToUpper(string(callSign)))
+func Get(callSign string) (record row.Record, found bool) {
+	callSign = strings.ToUpper(string(callSign))
 	record, found = table.Rows[callSign]
 	return
 }
@@ -104,5 +104,5 @@ func GetAll() []row.Record {
 
 // Clear removes all records from DB
 func Clear() {
-	table.Rows = make(map[row.CallSign]row.Record)
+	table.Rows = make(map[string]row.Record) // CallSign is primary key
 }

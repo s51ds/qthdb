@@ -85,27 +85,27 @@ func parseN1mmCallHistoryLine(line string, sep string) (record row.Record, err e
 	case inputCase.loc1andLoc2():
 		{
 
-			if record, err = row.MakeNewRecord(row.CallSign(ss[0]), row.Locator(ss[2]), "", ""); err != nil {
+			if record, err = row.MakeNewRecord(ss[0], row.LocatorString(ss[2]), "", ""); err != nil {
 				return row.Record{}, err
 			}
-			if err = record.Update(row.Locator(ss[3]), "", ""); err != nil {
+			if err = record.Update(row.LocatorString(ss[3]), "", ""); err != nil {
 				return row.Record{}, err
 			}
 		}
 	case inputCase.loc1Only():
 		{
-			if record, err = row.MakeNewRecord(row.CallSign(ss[0]), row.Locator(ss[2]), "", ""); err != nil {
+			if record, err = row.MakeNewRecord(ss[0], row.LocatorString(ss[2]), "", ""); err != nil {
 				return row.Record{}, err
 			}
 		}
 	case inputCase.loc2Only():
 		{
-			if record, err = row.MakeNewRecord(row.CallSign(ss[0]), row.Locator(ss[3]), "", ""); err != nil {
+			if record, err = row.MakeNewRecord(ss[0], row.LocatorString(ss[3]), "", ""); err != nil {
 				return row.Record{}, err
 			}
 		}
 	default:
-		if record, err = row.MakeNewRecord(row.CallSign(ss[0]), "", "", ""); err != nil {
+		if record, err = row.MakeNewRecord(ss[0], "", "", ""); err != nil {
 			return row.Record{}, err
 		}
 	}
@@ -121,7 +121,7 @@ func parseN1mmGenericFileLine(line string) (record row.Record, err error) {
 	if len(ss) < 12 {
 		return record, errors.New(fmt.Sprintf("wrong line:%s", line))
 	}
-	if record, err = row.MakeNewRecord(row.CallSign(ss[8]), row.Locator(ss[11]), ss[0], ss[1]); err != nil {
+	if record, err = row.MakeNewRecord(ss[8], row.LocatorString(ss[11]), ss[0], ss[1]); err != nil {
 		return row.Record{}, err
 	}
 	return
@@ -138,7 +138,7 @@ func parseEdiQsoRecord(line string) (record row.Record, err error) {
 	if yyyymmdd, err = timing.FourDigitsYear(yyyymmdd); err != nil {
 		return
 	}
-	if record, err = row.MakeNewRecord(row.CallSign(ss[2]), row.Locator(ss[9]), yyyymmdd, ss[1]); err != nil {
+	if record, err = row.MakeNewRecord(ss[2], row.LocatorString(ss[9]), yyyymmdd, ss[1]); err != nil {
 		return row.Record{}, err
 	}
 	return

@@ -8,7 +8,7 @@ import (
 // TODO: implement Query
 
 func Query(callSign string, queryCase row.QueryCase) {
-	rec, _ := Get(row.CallSign(callSign))
+	rec, _ := Get(callSign)
 	resp := rec.Locators().SortedByTime()
 	for _, v := range resp {
 		t := v.LogTime.Sprint(true)
