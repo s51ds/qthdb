@@ -13,7 +13,7 @@ func Test_makeNewRecordNew(t *testing.T) {
 	wantJN76TO, _ := MakeNewRecord("S59ABC", "JN76TO", "20210405", "1408")
 	type args struct {
 		callSign string
-		locator  LocatorString
+		locator  string
 		yyyymmdd string
 		hhmm     string
 	}
@@ -183,10 +183,10 @@ func TestRecord_Update(t *testing.T) {
 		t.Error("rec.locators) != 2")
 	}
 
-	if len(rec.locators[LocatorString("JN76PO")]) != 1 {
+	if len(rec.locators["JN76PO"]) != 1 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators[LocatorString("JN76TO")]) != 1 {
+	if len(rec.locators["JN76TO"]) != 1 {
 		t.Error("unexpected")
 	}
 	//
@@ -206,10 +206,10 @@ func TestRecord_Update(t *testing.T) {
 		t.Error("rec.locators) != 2")
 	}
 
-	if len(rec.locators[LocatorString("JN76PO")]) != 1 {
+	if len(rec.locators["JN76PO"]) != 1 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators[LocatorString("JN76TO")]) != 1 {
+	if len(rec.locators["JN76TO"]) != 1 {
 		t.Error("unexpected")
 	}
 	//
@@ -230,10 +230,10 @@ func TestRecord_Update(t *testing.T) {
 		t.Error("rec.locators) != 2")
 	}
 
-	if len(rec.locators[LocatorString("JN76PO")]) != 2 {
+	if len(rec.locators["JN76PO"]) != 2 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators[LocatorString("JN76TO")]) != 2 {
+	if len(rec.locators["JN76TO"]) != 2 {
 		t.Error("unexpected")
 	}
 	//
@@ -254,10 +254,10 @@ func TestRecord_Update(t *testing.T) {
 		t.Error("rec.locators) != 2")
 	}
 
-	if len(rec.locators[LocatorString("JN76PO")]) != 3 {
+	if len(rec.locators["JN76PO"]) != 3 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators[LocatorString("JN76TO")]) != 3 {
+	if len(rec.locators["JN76TO"]) != 3 {
 		t.Error("unexpected")
 	}
 

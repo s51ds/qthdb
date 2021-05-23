@@ -28,12 +28,12 @@ func (t LocatorTimes) SortedByTime() []timing.LogTime {
 }
 
 type LocatorWithLogTimes struct {
-	locator LocatorString
+	locator string
 	logTime []timing.LogTime
 }
 
 type QueryResponse struct {
-	Locator LocatorString
+	Locator string
 	LogTime timing.LogTime
 }
 

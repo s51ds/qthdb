@@ -16,19 +16,19 @@ type empty struct{}
 // type CallSignString string
 
 // LocatorString is just a string
-type LocatorString string
+//type LocatorString string
 
 // LocatorTimes has primary key LogTime
 type LocatorTimes map[timing.LogTime]empty
 
-// LocatorsMap has primary key LocatorString, value is LocatorTimes
-type LocatorsMap map[LocatorString]LocatorTimes
+// LocatorsMap has key Locator, value is LocatorTimes
+type LocatorsMap map[string]LocatorTimes
 
 // StringLocators returns all locators separated with space
 func (l LocatorsMap) StringLocators() string {
 	sb := strings.Builder{}
 	for k := range l {
-		sb.WriteString(string(k))
+		sb.WriteString(k)
 		sb.WriteString(" ")
 	}
 	return sb.String()
@@ -67,8 +67,8 @@ func (r *Record) Merge(n Record) error {
 // MakeNewRecord returns new record, CallSign is mandatory, others params can be empty strings.
 // If locator is not empty than the last two can be empty. If they are not, the syntax check is strict,
 // and an error can be returned.
-func MakeNewRecord(callSign string, locator LocatorString, yyyymmdd, hhmm string) (Record, error) {
-	callSign = strings.ToUpper(string(callSign))
+func MakeNewRecord(callSign string, locator string, yyyymmdd, hhmm string) (Record, error) {
+	callSign = strings.ToUpper(callSign)
 	if callSign == "" {
 		return Record{}, errors.New("CallSign is empty")
 	}
@@ -80,7 +80,7 @@ func MakeNewRecord(callSign string, locator LocatorString, yyyymmdd, hhmm string
 		return Record{}, err
 	}
 	if locator != "" {
-		if !validate.Locator(string(locator)) {
+		if !validate.Locator(locator) {
 			return Record{}, errors.New(fmt.Sprintf("locator:%s is not valid", locator))
 		}
 		locatorsWithTime := make(LocatorTimes)
@@ -98,11 +98,11 @@ func MakeNewRecord(callSign string, locator LocatorString, yyyymmdd, hhmm string
 // data.
 // If yyyymmdd and hhmm are not empty strings, the syntax check is strict,
 // error can be returned
-func (r *Record) Update(locator LocatorString, yyyymmdd, hhmm string) error {
+func (r *Record) Update(locator string, yyyymmdd, hhmm string) error {
 	if locator == "" {
 		return errors.New("locator is empty")
 	}
-	if !validate.Locator(string(locator)) {
+	if !validate.Locator(locator) {
 		return errors.New(fmt.Sprintf("locator:%s is not valid", locator))
 	}
 
@@ -130,7 +130,7 @@ func (r *Record) String() string {
 	sb.WriteString("Record{")
 	sb.WriteString(fmt.Sprintf("CallSign:%s, locators[", r.CallSign))
 	for k0, v0 := range r.locators {
-		sb.WriteString(fmt.Sprintf("%s:[", string(k0)))
+		sb.WriteString(fmt.Sprintf("%s:[", k0))
 		for k1 := range v0 {
 			sb.WriteString(fmt.Sprintf("%s, ", k1.GetString()))
 		}

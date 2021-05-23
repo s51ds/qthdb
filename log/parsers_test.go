@@ -441,7 +441,7 @@ func Test_parseN1mmGenericFileLine(t *testing.T) {
 
 func Test_parseEdiQsoRecord(t *testing.T) {
 	//210306;1428;S56P;1;59;004;59;025;;JN76PO;26;;;;
-	rec, _ := row.MakeNewRecord("S56P", row.LocatorString("JN76PO"), "20210306", "1428")
+	rec, _ := row.MakeNewRecord("S56P", "JN76PO", "20210306", "1428")
 	type args struct {
 		line string
 	}
@@ -492,9 +492,9 @@ func Test_parseEdiQsoRecord(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
-	recEdi, _ := row.MakeNewRecord("S59ABC", row.LocatorString("JN76TO"), "20210306", "1428")
-	recHistory, _ := row.MakeNewRecord("S59ABC", row.LocatorString("JN76TO"), "", "")
-	recGeneric, _ := row.MakeNewRecord("S52ME", row.LocatorString("JN76TM"), "20200704", "1453")
+	recEdi, _ := row.MakeNewRecord("S59ABC", "JN76TO", "20210306", "1428")
+	recHistory, _ := row.MakeNewRecord("S59ABC", "JN76TO", "", "")
+	recGeneric, _ := row.MakeNewRecord("S52ME", "JN76TM", "20200704", "1453")
 
 	type args struct {
 		logType Type
