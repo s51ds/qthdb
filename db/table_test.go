@@ -101,6 +101,6 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestPersists(t *testing.T) {
-	Persists()
-}
+//func TestPersists(t *testing.T) {
+//	Persists()
+//}

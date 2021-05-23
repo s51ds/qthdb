@@ -157,5 +157,6 @@ func TestMakeN1mmVhfSCP(t *testing.T) {
 		t.Errorf("WTF, nil=")
 	}
 
+	db.Persists()
 	db.Clear()
 }
