@@ -10,11 +10,7 @@ import (
 // LogTime with it's functions and method handles all timing
 // functionality we need for this project
 type LogTime struct {
-	loggedTime gotime.Time
-}
-
-func (t *LogTime) SetLoggedTime(loggedTime gotime.Time) {
-	t.loggedTime = loggedTime
+	LoggedTime gotime.Time
 }
 
 // MakeLogTime parses yyyymmdd and hhmm and returns LogTime.
@@ -27,42 +23,37 @@ func MakeLogTime(yyyymmdd, hhmm string) (logTime LogTime, err error) {
 
 	//https://golangbyexample.com/parse-time-in-golang/
 	t, err := gotime.Parse("200601021504", yyyymmdd+hhmm)
-	logTime.loggedTime = t
+	logTime.LoggedTime = t
 
 	return
-}
-
-// LoggedTime is getter for loggedTime
-func (t *LogTime) LoggedTime() gotime.Time {
-	return t.loggedTime
 }
 
 // IsLogTimeZero returns true if LogTime has zero value (January 1, year 1, 00:00:00.000000000 UTC.)
 // LogTime has zero value if date and gotime was not available during data imports. Such case
 // the case when import is from SCP file
 func (t *LogTime) IsLogTimeZero() bool {
-	return t.loggedTime.IsZero()
+	return t.LoggedTime.IsZero()
 }
 
 // GetUnix returns t as a Unix gotime, the number of seconds elapsed
 // since January 1, 1970 UTC.
 func (t *LogTime) GetUnix() int64 {
-	return t.loggedTime.Unix()
+	return t.LoggedTime.Unix()
 }
 
 // GetMonth returns t short month names (JAN,FEB...,DEC)
 func (t *LogTime) GetMonth() string {
-	return shortMonthNames[t.loggedTime.Month()-1]
+	return shortMonthNames[t.LoggedTime.Month()-1]
 }
 
 // GetYear returns t year as string
 func (t *LogTime) GetYear() string {
-	return strconv.Itoa(t.loggedTime.Year())
+	return strconv.Itoa(t.LoggedTime.Year())
 }
 
 // GetString returns string formatted for debugging/logging purposes
 func (t *LogTime) GetString() string {
-	return t.loggedTime.String()
+	return t.LoggedTime.String()
 }
 
 // FourDigitsYear convert yymmdd to yyyymmdd. if yy > 80 returns 19yymmdd
@@ -95,7 +86,7 @@ func (t *LogTime) Sprint(hint bool) string {
 		return ""
 	}
 	now := gotime.Now().UTC()
-	if now.Month() == t.loggedTime.Month() && hint {
+	if now.Month() == t.LoggedTime.Month() && hint {
 		return t.GetMonth() + " " + t.GetYear() + "     <-----"
 	} else {
 		return t.GetMonth() + " " + t.GetYear()
@@ -121,5 +112,5 @@ var shortMonthNames = []string{
 type ByTime []LogTime
 
 func (a ByTime) Len() int           { return len(a) }
-func (a ByTime) Less(i, j int) bool { return a[i].loggedTime.Unix() > a[j].loggedTime.Unix() }
+func (a ByTime) Less(i, j int) bool { return a[i].LoggedTime.Unix() > a[j].LoggedTime.Unix() }
 func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

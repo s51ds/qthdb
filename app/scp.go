@@ -65,7 +65,7 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 						if i == 0 {
 							// skip, loc1 is already set
 						}
-						if loc1 != string(v.Locator) && v.LogTime.LoggedTime().Month() == month {
+						if loc1 != v.Locator && v.LogTime.LoggedTime.Month() == month {
 							// found
 							monthFound = true
 							loc2 = string(v.Locator)
@@ -79,9 +79,9 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 						if i == 0 {
 							// skip, loc1 is already set
 						}
-						if loc1 != string(v.Locator) {
+						if loc1 != v.Locator {
 							// found
-							loc2 = string(v.Locator)
+							loc2 = v.Locator
 							break
 						}
 					}

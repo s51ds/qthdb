@@ -49,7 +49,7 @@ func (l LocatorsMap) SortedByTime() (resp []QueryResponse) {
 		lwt.logTime = make([]timing.LogTime, 0, 10)
 		for k1 := range v {
 			lt := timing.LogTime{}
-			lt.SetLoggedTime(k1.LoggedTime())
+			lt.LoggedTime = k1.LoggedTime
 			lwt.logTime = append(lwt.logTime, lt)
 		}
 		mainSlice = append(mainSlice, lwt)
@@ -61,7 +61,7 @@ func (l LocatorsMap) SortedByTime() (resp []QueryResponse) {
 			qr := QueryResponse{}
 			qr.Locator = locator
 			lt := timing.LogTime{}
-			lt.SetLoggedTime(v1.LoggedTime())
+			lt.LoggedTime = v1.LoggedTime
 			qr.LogTime = lt
 			resp = append(resp, qr)
 		}
