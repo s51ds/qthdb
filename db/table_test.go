@@ -100,3 +100,7 @@ func TestGet(t *testing.T) {
 		})
 	}
 }
+
+func TestPersists(t *testing.T) {
+	Persists()
+}

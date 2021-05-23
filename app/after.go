@@ -38,10 +38,16 @@ func doReport(logData, scpData []data) error {
 	for i, qso := range logData {
 		if locs, has := scpMap[qso.callSign]; has {
 			if !strings.Contains(locs, qso.locators) {
+				// There are max two locators in scp. Check db, there can be many locators for this callSign.
+				// If locator exists in the db, it is ok otherwise execute next line.
+				// When db will be updated with this log, this locator will be on the first place in
+				// new scp created for this Month
 				fmt.Println(fmt.Sprintf("qso %03d %s %s -> qso locator differs from locators in scp:%s", i+1, qso.callSign, qso.locators, locs))
 			}
 		} else {
 			fmt.Println(fmt.Sprintf("qso %03d %s %s -> locator not in scp", i+1, qso.callSign, qso.locators))
+			// may be the callSign is wrong: read all callSigns that used that locator in the past and
+			// show useful info
 		}
 	}
 	return nil
