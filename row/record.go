@@ -12,19 +12,13 @@ import (
 // empty is used in maps where only key has value
 type empty struct{}
 
-// CallSignString is just a string
-// type CallSignString string
-
-// LocatorString is just a string
-//type LocatorString string
-
 // LocatorTimes has primary key LogTime
 type LocatorTimes map[timing.LogTime]empty
 
 // LocatorsMap has key Locator, value is LocatorTimes
 type LocatorsMap map[string]LocatorTimes
 
-// StringLocators returns all locators separated with space
+// StringLocators returns all Locators separated with space
 func (l LocatorsMap) StringLocators() string {
 	sb := strings.Builder{}
 	for k := range l {
@@ -34,14 +28,10 @@ func (l LocatorsMap) StringLocators() string {
 	return sb.String()
 }
 
-// Record consists from CallSign associated with zero or more locators
+// Record consists from CallSign associated with zero or more Locators
 type Record struct {
 	CallSign string
-	locators LocatorsMap
-}
-
-func (r *Record) Locators() LocatorsMap {
-	return r.locators
+	Locators LocatorsMap
 }
 
 //Merge merges new record n into existed record r. Returns error if r and n CallSign is not the same
@@ -50,14 +40,14 @@ func (r *Record) Merge(n Record) error {
 		return errors.New(fmt.Sprintf("n CallSign:%s is not the same as in current record: %s", n.CallSign, r.CallSign))
 	}
 
-	for kNLocator, vNLocatorTimes := range n.locators {
-		if _, has := r.locators[kNLocator]; has {
-			locatorTimes := r.locators[kNLocator]
-			for k := range n.locators[kNLocator] {
+	for kNLocator, vNLocatorTimes := range n.Locators {
+		if _, has := r.Locators[kNLocator]; has {
+			locatorTimes := r.Locators[kNLocator]
+			for k := range n.Locators[kNLocator] {
 				locatorTimes[k] = empty{}
 			}
 		} else { // newLocator does not exist in exist in r
-			r.locators[kNLocator] = vNLocatorTimes
+			r.Locators[kNLocator] = vNLocatorTimes
 		}
 	}
 
@@ -88,13 +78,13 @@ func MakeNewRecord(callSign string, locator string, yyyymmdd, hhmm string) (Reco
 
 		locators := make(LocatorsMap)
 		locators[locator] = locatorsWithTime
-		return Record{CallSign: callSign, locators: locators}, nil
+		return Record{CallSign: callSign, Locators: locators}, nil
 	} else { // no locator
-		return Record{CallSign: callSign, locators: LocatorsMap{}}, nil
+		return Record{CallSign: callSign, Locators: LocatorsMap{}}, nil
 	}
 }
 
-// Update updates locators with a new locator or updates the current locator's
+// Update updates Locators with a new locator or updates the current locator's
 // data.
 // If yyyymmdd and hhmm are not empty strings, the syntax check is strict,
 // error can be returned
@@ -110,26 +100,26 @@ func (r *Record) Update(locator string, yyyymmdd, hhmm string) error {
 	if err != nil {
 		return err
 	}
-	if locatorTimes, has := r.locators[locator]; has {
+	if locatorTimes, has := r.Locators[locator]; has {
 		locatorTimes[logTime] = empty{}
 	} else {
 		locatorsWithTime := make(LocatorTimes)
 		locatorsWithTime[logTime] = empty{}
-		r.locators[locator] = locatorsWithTime
+		r.Locators[locator] = locatorsWithTime
 	}
 	return nil
 }
 
 // IsZero reports whether r has zero value
 func (r *Record) IsZero() bool {
-	return r.CallSign == "" && r.locators == nil
+	return r.CallSign == "" && r.Locators == nil
 }
 
 func (r *Record) String() string {
 	sb := strings.Builder{}
 	sb.WriteString("Record{")
-	sb.WriteString(fmt.Sprintf("CallSign:%s, locators[", r.CallSign))
-	for k0, v0 := range r.locators {
+	sb.WriteString(fmt.Sprintf("CallSign:%s, Locators[", r.CallSign))
+	for k0, v0 := range r.Locators {
 		sb.WriteString(fmt.Sprintf("%s:[", k0))
 		for k1 := range v0 {
 			sb.WriteString(fmt.Sprintf("%s, ", k1.GetString()))

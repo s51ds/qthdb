@@ -32,7 +32,7 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	for _, r := range rows {
 		callSign := string(r.CallSign)
 		var loc1, loc2 string
-		resp := r.Locators().SortedByTime()
+		resp := r.Locators.SortedByTime()
 		switch len(resp) {
 		case 0:
 			{

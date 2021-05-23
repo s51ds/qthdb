@@ -33,7 +33,7 @@ func Test_makeNewRecordNew(t *testing.T) {
 			},
 			want: Record{
 				CallSign: "",
-				locators: nil,
+				Locators: nil,
 			},
 			wantErr: true,
 		},
@@ -47,7 +47,7 @@ func Test_makeNewRecordNew(t *testing.T) {
 			},
 			want: Record{
 				CallSign: "",
-				locators: nil,
+				Locators: nil,
 			},
 			wantErr: true,
 		},
@@ -61,7 +61,7 @@ func Test_makeNewRecordNew(t *testing.T) {
 			},
 			want: Record{
 				CallSign: "",
-				locators: nil,
+				Locators: nil,
 			},
 			wantErr: true,
 		},
@@ -76,7 +76,7 @@ func Test_makeNewRecordNew(t *testing.T) {
 			},
 			want: Record{
 				CallSign: "",
-				locators: nil,
+				Locators: nil,
 			},
 			wantErr: true,
 		},
@@ -90,7 +90,7 @@ func Test_makeNewRecordNew(t *testing.T) {
 			},
 			want: Record{
 				CallSign: "",
-				locators: nil,
+				Locators: nil,
 			},
 			wantErr: true,
 		},
@@ -104,7 +104,7 @@ func Test_makeNewRecordNew(t *testing.T) {
 			},
 			want: Record{
 				CallSign: "S59ABC",
-				locators: LocatorsMap{},
+				Locators: LocatorsMap{},
 			},
 			wantErr: false,
 		},
@@ -141,7 +141,7 @@ func TestRecord_String(t *testing.T) {
 
 func TestRecord_Update(t *testing.T) {
 	rec, _ := MakeNewRecord("S59ABC", "", "", "")
-	want := "Record{CallSign:S59ABC, locators[]}"
+	want := "Record{CallSign:S59ABC, Locators[]}"
 	got := rec.String()
 	if want != got {
 		t.Errorf("MakeNewRecord() got = %s, want %s", got, want)
@@ -168,7 +168,7 @@ func TestRecord_Update(t *testing.T) {
 		t.Error(err.Error())
 	}
 	got = rec.String()
-	want = "Record{CallSign:S59ABC, locators[JN76TO:[2021-04-05 17:15:00 +0000 UTC, ],]}"
+	want = "Record{CallSign:S59ABC, Locators[JN76TO:[2021-04-05 17:15:00 +0000 UTC, ],]}"
 	if want != got {
 		t.Errorf("Update() got = %s, want %s", got, want)
 	}
@@ -178,15 +178,15 @@ func TestRecord_Update(t *testing.T) {
 	if err := rec.Update("JN76PO", "20210405", "1715"); err != nil {
 		t.Error(err.Error())
 	}
-	if len(rec.locators) != 2 {
+	if len(rec.Locators) != 2 {
 		fmt.Println(rec.String())
-		t.Error("rec.locators) != 2")
+		t.Error("rec.Locators) != 2")
 	}
 
-	if len(rec.locators["JN76PO"]) != 1 {
+	if len(rec.Locators["JN76PO"]) != 1 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators["JN76TO"]) != 1 {
+	if len(rec.Locators["JN76TO"]) != 1 {
 		t.Error("unexpected")
 	}
 	//
@@ -201,15 +201,15 @@ func TestRecord_Update(t *testing.T) {
 	if err := rec.Update("JN76PO", "20210405", "1715"); err != nil {
 		t.Error(err.Error())
 	}
-	if len(rec.locators) != 2 {
+	if len(rec.Locators) != 2 {
 		fmt.Println(rec.String())
-		t.Error("rec.locators) != 2")
+		t.Error("rec.Locators) != 2")
 	}
 
-	if len(rec.locators["JN76PO"]) != 1 {
+	if len(rec.Locators["JN76PO"]) != 1 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators["JN76TO"]) != 1 {
+	if len(rec.Locators["JN76TO"]) != 1 {
 		t.Error("unexpected")
 	}
 	//
@@ -225,15 +225,15 @@ func TestRecord_Update(t *testing.T) {
 	if err := rec.Update("JN76PO", "20200405", "1715"); err != nil {
 		t.Error(err.Error())
 	}
-	if len(rec.locators) != 2 {
+	if len(rec.Locators) != 2 {
 		fmt.Println(rec.String())
-		t.Error("rec.locators) != 2")
+		t.Error("rec.Locators) != 2")
 	}
 
-	if len(rec.locators["JN76PO"]) != 2 {
+	if len(rec.Locators["JN76PO"]) != 2 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators["JN76TO"]) != 2 {
+	if len(rec.Locators["JN76TO"]) != 2 {
 		t.Error("unexpected")
 	}
 	//
@@ -249,15 +249,15 @@ func TestRecord_Update(t *testing.T) {
 	if err := rec.Update("JN76PO", "", ""); err != nil {
 		t.Error(err.Error())
 	}
-	if len(rec.locators) != 2 {
+	if len(rec.Locators) != 2 {
 		fmt.Println(rec.String())
-		t.Error("rec.locators) != 2")
+		t.Error("rec.Locators) != 2")
 	}
 
-	if len(rec.locators["JN76PO"]) != 3 {
+	if len(rec.Locators["JN76PO"]) != 3 {
 		t.Error("unexpected")
 	}
-	if len(rec.locators["JN76TO"]) != 3 {
+	if len(rec.Locators["JN76TO"]) != 3 {
 		t.Error("unexpected")
 	}
 
@@ -387,7 +387,7 @@ func TestLocators_SortedByTime(t *testing.T) {
 	_ = rec.Update("JN76PO", "20210604", "1001")
 	_ = rec.Update("JN76TO", "20210304", "1000")
 
-	locators := rec.Locators()
+	locators := rec.Locators
 	resp := locators.SortedByTime()
 	data := []string{
 		"JN76PO 2021-06-04 10:01:00 +0000 UTC",

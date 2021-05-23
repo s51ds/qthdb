@@ -138,7 +138,7 @@ func readData(fileName string, logType hamLog.Type) (resp []data, err error) {
 func recData(rec row.Record) data {
 	d := data{
 		callSign: string(rec.CallSign),
-		locators: rec.Locators().StringLocators(),
+		locators: rec.Locators.StringLocators(),
 	}
 	return d
 }
