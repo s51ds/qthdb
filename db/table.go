@@ -9,6 +9,7 @@ import (
 
 var table Table
 
+// TODO: remove
 func init() {
 	Open("./db.gob")
 }

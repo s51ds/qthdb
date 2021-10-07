@@ -9,14 +9,14 @@ import (
 
 var gobFileName string
 
-func Open(fileName string) {
+func Open(fileName string) error {
 	gobFileName = fileName
 	table = Table{}
 	table.Rows = make(map[string]row.Record)
 
 	// try to load from disk
 	if file, err := os.Open(gobFileName); err != nil {
-		fmt.Println("init()", err.Error())
+		return err
 	} else {
 		decoder := gob.NewDecoder(file)
 		defer func() {
@@ -25,12 +25,12 @@ func Open(fileName string) {
 			}
 		}()
 		if err = decoder.Decode(&table); err != nil {
-			fmt.Println("init()", err.Error())
+			return err
 		} else {
 			fmt.Println("db load from disk, file=" + file.Name())
 			fmt.Println(fmt.Sprintf("number of rows:%d", NumberOfRows()))
 
 		}
 	}
-
+	return nil
 }
