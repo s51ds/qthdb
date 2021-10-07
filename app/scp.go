@@ -14,6 +14,8 @@ func sPrintN1mmScpFormat(callSign, loc1, loc2 string) string {
 	return fmt.Sprintf("%s,,%s,%s", callSign, loc1, loc2)
 }
 
+// MakeN1mmScpFile creates N1MM scp file. File is created from data from DB
+// and customized for specified contest. month defined contest.
 func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	if month < 0 || month > 12 {
 		return errors.New(fmt.Sprintf("invalid Month:%d", month))

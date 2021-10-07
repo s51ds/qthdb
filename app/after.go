@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/s51ds/qthdb/db"
 	"github.com/s51ds/qthdb/file"
 	hamLog "github.com/s51ds/qthdb/log"
 	"github.com/s51ds/qthdb/row"
 	"strings"
 )
 
+// AfterTheContest compare log and scp and produce report to stdio if locators differs
 func AfterTheContest(ediLogFileName, scpFileName string) error {
 	logData, err := readData(ediLogFileName, hamLog.TypeEdiFile)
 	if err != nil {
@@ -42,6 +44,7 @@ func doReport(logData, scpData []data) error {
 				// If locator exists in the db, it is ok otherwise execute next line.
 				// When db will be updated with this log, this locator will be on the first place in
 				// new scp created for this Month
+				db.Query(qso.callSign, row.QueryLatestAll)
 				fmt.Println(fmt.Sprintf("qso %03d %s %s -> qso locator differs from locators in scp:%s", i+1, qso.callSign, qso.locators, locs))
 			}
 		} else {
