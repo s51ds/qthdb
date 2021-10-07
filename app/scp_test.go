@@ -157,7 +157,9 @@ func TestMakeN1mmVhfSCP(t *testing.T) {
 		t.Errorf("WTF, nil=")
 	}
 
-	db.Persists()
+	if err := db.Persists(); err != nil {
+		fmt.Println(err.Error())
+	}
 	db.Clear()
 }
 
@@ -194,6 +196,8 @@ func TestMakeN1mmVhfSCPJUN2021(t *testing.T) {
 		t.Errorf("WTF, nil=")
 	}
 
-	db.Persists()
+	if err := db.Persists(); err != nil {
+		fmt.Println(err.Error())
+	}
 	db.Clear()
 }
