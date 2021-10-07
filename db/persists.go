@@ -6,9 +6,9 @@ import (
 	"os"
 )
 
-// Persists store DB to disk, file name is db.gob on working directory
+// Persists store DB to disk, gobFileName is set during db/open() process
 func Persists() {
-	if file, err := os.Create("./db.gob"); err != nil {
+	if file, err := os.Create(gobFileName); err != nil {
 		fmt.Println("Persists", err.Error())
 	} else {
 		encoder := gob.NewEncoder(file)
