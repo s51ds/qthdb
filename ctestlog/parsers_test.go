@@ -1,4 +1,4 @@
-package log
+package ctestlog
 
 import (
 	"github.com/s51ds/qthdb/row"
