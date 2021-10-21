@@ -2,16 +2,16 @@ package file
 
 import (
 	"fmt"
+	"github.com/s51ds/qthdb/ctestlog"
 	"github.com/s51ds/qthdb/db"
-	"github.com/s51ds/qthdb/log"
 	"testing"
 )
 
 func Test_FakeLog_LineParsers(t *testing.T) {
 	db.Clear()
 
-	parseTestLine := func(logType log.Type, line string) error {
-		if rec, err := log.Parse(logType, line); err != nil {
+	parseTestLine := func(logType ctestlog.Type, line string) error {
+		if rec, err := ctestlog.Parse(logType, line); err != nil {
 			return err
 		} else {
 			err = db.Put(rec)
@@ -50,7 +50,7 @@ func Test_FakeLog_LineParsers(t *testing.T) {
 	}
 
 	for _, v := range N1mmCallHistoryLines {
-		err := parseTestLine(log.TypeN1mmCallHistory, v)
+		err := parseTestLine(ctestlog.TypeN1mmCallHistory, v)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -83,7 +83,7 @@ func Test_FakeLog_LineParsers(t *testing.T) {
 		"20200704 1418   144409,86  USB S59ABC         59 018 JN76TO  YP2DX             59 008 KN05NR   435",
 	}
 	for _, v := range N1mmGenericFileLines {
-		_ = parseTestLine(log.TypeN1mmGenericFile, v)
+		_ = parseTestLine(ctestlog.TypeN1mmGenericFile, v)
 	}
 
 	EdiFileLines2021 := []string{
@@ -100,7 +100,7 @@ func Test_FakeLog_LineParsers(t *testing.T) {
 		"210306;1442;9A1E;1;59;011;59;025;;JN85QT;161;;;;   ",
 	}
 	for _, v := range EdiFileLines2021 {
-		_ = parseTestLine(log.TypeEdiFile, v)
+		_ = parseTestLine(ctestlog.TypeEdiFile, v)
 	}
 
 	EdiFileLines2020 := []string{
@@ -117,7 +117,7 @@ func Test_FakeLog_LineParsers(t *testing.T) {
 		"200904;1442;9A1E;1;59;011;59;025;;JN85QT;161;;;;   ",
 	}
 	for _, v := range EdiFileLines2020 {
-		_ = parseTestLine(log.TypeEdiFile, v)
+		_ = parseTestLine(ctestlog.TypeEdiFile, v)
 	}
 
 	EdiFileLines1999 := []string{
@@ -134,7 +134,7 @@ func Test_FakeLog_LineParsers(t *testing.T) {
 		"990306;1442;9A1E;1;59;011;59;025;;JN85QT;161;;;;   ",
 	}
 	for _, v := range EdiFileLines1999 {
-		_ = parseTestLine(log.TypeEdiFile, v)
+		_ = parseTestLine(ctestlog.TypeEdiFile, v)
 	}
 
 	EdiFileLines1999 = []string{
@@ -151,7 +151,7 @@ func Test_FakeLog_LineParsers(t *testing.T) {
 		"990306;1442;9A1E;1;59;011;59;025;;JN85QT;161;;;;   ",
 	}
 	for _, v := range EdiFileLines1999 {
-		_ = parseTestLine(log.TypeEdiFile, v)
+		_ = parseTestLine(ctestlog.TypeEdiFile, v)
 	}
 
 	fmt.Println(db.String())
@@ -159,42 +159,42 @@ func Test_FakeLog_LineParsers(t *testing.T) {
 
 func TestInsertLog(t *testing.T) {
 	db.Clear()
-	if err := InsertLog("../testdata/S59ABC-NOV2020.edi", log.TypeEdiFile); err != nil {
+	if err := InsertLog("../testdata/S59ABC-NOV2020.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 205 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 205, db.NumberOfRows()))
 	}
 
-	if err := InsertLog("../testdata/S59ABC-MAR2021.edi", log.TypeEdiFile); err != nil {
+	if err := InsertLog("../testdata/S59ABC-MAR2021.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 413 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 413, db.NumberOfRows()))
 	}
 
-	if err := InsertLog("../testdata/vhf.txt", log.TypeN1mmCallHistory); err != nil {
+	if err := InsertLog("../testdata/vhf.txt", ctestlog.TypeN1mmCallHistory); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 43654 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 43654, db.NumberOfRows()))
 	}
 
-	if err := InsertLog("../testdata/S59ABC-NOV2020.edi", log.TypeEdiFile); err != nil {
+	if err := InsertLog("../testdata/S59ABC-NOV2020.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 43654 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 43654, db.NumberOfRows()))
 	}
 
-	if err := InsertLog("../testdata/S59ABC-VHF-SEP2019.txt", log.TypeEdiFile); err == nil {
+	if err := InsertLog("../testdata/S59ABC-VHF-SEP2019.txt", ctestlog.TypeEdiFile); err == nil {
 		t.Errorf("Expected error file:S59ABC-VHF-SEP2019.txt is not TypeEdiFile")
 	}
 	if db.NumberOfRows() != 43654 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 43654, db.NumberOfRows()))
 	}
 
-	if err := InsertLog("../testdata/S59ABC-VHF-SEP2019.txt", log.TypeN1mmGenericFile); err != nil {
+	if err := InsertLog("../testdata/S59ABC-VHF-SEP2019.txt", ctestlog.TypeN1mmGenericFile); err != nil {
 		t.Error(err.Error())
 	}
 	if db.NumberOfRows() != 43656 {

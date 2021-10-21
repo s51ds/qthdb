@@ -14,6 +14,8 @@ func sPrintN1mmScpFormat(callSign, loc1, loc2 string) string {
 	return fmt.Sprintf("%s,,%s,%s", callSign, loc1, loc2)
 }
 
+// MakeN1mmScpFile creates N1MM scp file. File is created from data from DB
+// and customized for specified contest. month defined contest.
 func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	if month < 0 || month > 12 {
 		return errors.New(fmt.Sprintf("invalid Month:%d", month))
@@ -30,9 +32,9 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	scpLines := make([]string, 0, 10000)
 	rows := db.GetAll()
 	for _, r := range rows {
-		callSign := string(r.CallSign())
+		callSign := r.CallSign
 		var loc1, loc2 string
-		resp := r.Locators().SortedByTime()
+		resp := r.Locators.SortedByTime()
 		switch len(resp) {
 		case 0:
 			{
@@ -40,12 +42,12 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 			}
 		case 1:
 			{
-				loc1 = string(resp[0].Locator)
+				loc1 = resp[0].Locator
 			}
 		case 2:
 			{
-				loc1 = string(resp[0].Locator)
-				loc2 = string(resp[1].Locator)
+				loc1 = resp[0].Locator
+				loc2 = resp[1].Locator
 				if loc1 == loc2 { // same locator
 					loc2 = ""
 				}
@@ -65,7 +67,7 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 						if i == 0 {
 							// skip, loc1 is already set
 						}
-						if loc1 != string(v.Locator) && v.LogTime.LoggedTime().Month() == month {
+						if loc1 != v.Locator && v.LogTime.LoggedTime.Month() == month {
 							// found
 							monthFound = true
 							loc2 = string(v.Locator)
@@ -79,9 +81,9 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 						if i == 0 {
 							// skip, loc1 is already set
 						}
-						if loc1 != string(v.Locator) {
+						if loc1 != v.Locator {
 							// found
-							loc2 = string(v.Locator)
+							loc2 = v.Locator
 							break
 						}
 					}

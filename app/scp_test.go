@@ -2,9 +2,9 @@ package app
 
 import (
 	"fmt"
+	"github.com/s51ds/qthdb/ctestlog"
 	"github.com/s51ds/qthdb/db"
 	"github.com/s51ds/qthdb/file"
-	"github.com/s51ds/qthdb/log"
 	"testing"
 	"time"
 )
@@ -12,14 +12,14 @@ import (
 func TestGetAll(t *testing.T) {
 	// prepare DB
 	db.Clear()
-	if err := file.InsertLog("../testdata/S59ABC-NOV2020.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/S59ABC-NOV2020.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 205 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 205, db.NumberOfRows()))
 	}
 
-	if err := file.InsertLog("../testdata/S59ABC-MAR2021.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/S59ABC-MAR2021.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 413 {
@@ -86,21 +86,21 @@ func TestSprintScpFormat(t *testing.T) {
 
 func TestMakeN1mmScpFile1(t *testing.T) {
 	db.Clear()
-	if err := file.InsertLog("../testdata/S59ABC-NOV2020.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/S59ABC-NOV2020.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 205 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 205, db.NumberOfRows()))
 	}
 
-	if err := file.InsertLog("../testdata/S59ABC-MAR2021.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/S59ABC-MAR2021.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	if db.NumberOfRows() != 413 {
 		t.Errorf(fmt.Sprintf("want NumberOfRows:%d, got NumberOfRows:%d", 413, db.NumberOfRows()))
 	}
 
-	if err := file.InsertLog("../testdata/fake.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/fake.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 
@@ -111,7 +111,7 @@ func TestMakeN1mmScpFile1(t *testing.T) {
 
 func TestMakeN1mmScpFile2(t *testing.T) {
 	db.Clear()
-	if err := file.InsertLog("../testdata/fake.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/fake.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 	_ = MakeN1mmScpFile("../testdata/test.scp", time.March)
@@ -131,25 +131,25 @@ func TestMakeN1mmScpFile2(t *testing.T) {
 // Temporary for generating real scp file
 func TestMakeN1mmVhfSCP(t *testing.T) {
 	db.Clear()
-	if err := file.InsertLog("../testdata/scp/vhf.txt", log.TypeN1mmCallHistory); err != nil {
+	if err := file.InsertLog("../testdata/scp/vhf.txt", ctestlog.TypeN1mmCallHistory); err != nil {
 		fmt.Println(err.Error())
 	}
-	if err := file.InsertLog("../testdata/scp/S59ABC-MAR2020.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/scp/S59ABC-MAR2020.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
-	if err := file.InsertLog("../testdata/scp/S59ABC-MAR2021.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/scp/S59ABC-MAR2021.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
-	if err := file.InsertLog("../testdata/scp/S59ABC-Marconi2019.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/scp/S59ABC-Marconi2019.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
-	if err := file.InsertLog("../testdata/scp/S59ABC-NOV2020.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/scp/S59ABC-NOV2020.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
-	if err := file.InsertLog("../testdata/scp/S59ABC-SEP2020.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/scp/S59ABC-SEP2020.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
-	if err := file.InsertLog("../testdata/scp/september_2019.edi", log.TypeEdiFile); err != nil {
+	if err := file.InsertLog("../testdata/scp/september_2019.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
 
@@ -157,5 +157,47 @@ func TestMakeN1mmVhfSCP(t *testing.T) {
 		t.Errorf("WTF, nil=")
 	}
 
+	if err := db.Persists(); err != nil {
+		fmt.Println(err.Error())
+	}
+	db.Clear()
+}
+
+// Temporary for generating real scp file
+func TestMakeN1mmVhfSCPJUN2021(t *testing.T) {
+	db.Clear()
+	if err := file.InsertLog("../testdata/scp/jun/vhf.txt", ctestlog.TypeN1mmCallHistory); err != nil {
+		fmt.Println(err.Error())
+	}
+	if err := file.InsertLog("../testdata/scp/jun/S59ABC-Marconi2019.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	if err := file.InsertLog("../testdata/scp/jun/S59ABC-NOV2020.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	if err := file.InsertLog("../testdata/scp/jun/S59ABC-SEP2020.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	if err := file.InsertLog("../testdata/scp/jun/september_2019.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := file.InsertLog("../testdata/scp/jun/S59ABC-MAR2020.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := file.InsertLog("../testdata/scp/jun/S59ABC-MAR2021.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	if err := file.InsertLog("../testdata/scp/jun/S59ABC-MAY-2021.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+	if err := MakeN1mmScpFile("../testdata/scp/jun/vhf-jun-2021.txt", time.June); err != nil {
+		t.Errorf("WTF, nil=")
+	}
+
+	if err := db.Persists(); err != nil {
+		fmt.Println(err.Error())
+	}
 	db.Clear()
 }

@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	hamLog "github.com/s51ds/qthdb/ctestlog"
+	"github.com/s51ds/qthdb/db"
 	"github.com/s51ds/qthdb/file"
-	hamLog "github.com/s51ds/qthdb/log"
 	"github.com/s51ds/qthdb/row"
 	"strings"
 )
 
+// AfterTheContest compare log and scp and produce report to stdio if locators differs
 func AfterTheContest(ediLogFileName, scpFileName string) error {
 	logData, err := readData(ediLogFileName, hamLog.TypeEdiFile)
 	if err != nil {
@@ -38,10 +40,17 @@ func doReport(logData, scpData []data) error {
 	for i, qso := range logData {
 		if locs, has := scpMap[qso.callSign]; has {
 			if !strings.Contains(locs, qso.locators) {
+				// There are max two locators in scp. Check db, there can be many locators for this callSign.
+				// If locator exists in the db, it is ok otherwise execute next line.
+				// When db will be updated with this log, this locator will be on the first place in
+				// new scp created for this Month
+				db.Query(qso.callSign, row.QueryLatestAll)
 				fmt.Println(fmt.Sprintf("qso %03d %s %s -> qso locator differs from locators in scp:%s", i+1, qso.callSign, qso.locators, locs))
 			}
 		} else {
 			fmt.Println(fmt.Sprintf("qso %03d %s %s -> locator not in scp", i+1, qso.callSign, qso.locators))
+			// may be the callSign is wrong: read all callSigns that used that locator in the past and
+			// show useful info
 		}
 	}
 	return nil
@@ -55,6 +64,14 @@ type data struct {
 
 func (d *data) String() string {
 	return d.callSign + " " + d.locators
+}
+
+func recData(rec row.Record) data {
+	d := data{
+		callSign: rec.CallSign,
+		locators: rec.Locators.SprintLocators(),
+	}
+	return d
 }
 
 func readData(fileName string, logType hamLog.Type) (resp []data, err error) {
@@ -127,12 +144,4 @@ func readData(fileName string, logType hamLog.Type) (resp []data, err error) {
 
 	return
 
-}
-
-func recData(rec row.Record) data {
-	d := data{
-		callSign: string(rec.CallSign()),
-		locators: rec.Locators().StringLocators(),
-	}
-	return d
 }

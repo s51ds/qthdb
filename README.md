@@ -17,7 +17,7 @@ call sign"; DB's primary key. If data exists, then data can return the following
 - Records sorted by time; records for the selected month are marked
 - Records sorted by Month and then by time
   
-The only way to write data into **qthdb** is through the methods from package log.
+The only way to write data into **qthdb** is through the methods from package ctestlog.
 
 p.s.
 

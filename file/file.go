@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	hamLog "github.com/s51ds/qthdb/ctestlog"
 	"github.com/s51ds/qthdb/db"
-	hamLog "github.com/s51ds/qthdb/log"
 	"os"
 	"strings"
 )
