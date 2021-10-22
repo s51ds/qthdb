@@ -1,4 +1,4 @@
-package api
+package locators
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 
 func TestLocators(t *testing.T) {
 	callSign := "S59ABC"
-	resp := Locators(callSign)
+	resp := Get(callSign)
 	if len(resp) == 0 {
 		t.Errorf("unexpected, no locators for %s ", callSign)
 	}
@@ -31,7 +31,7 @@ func TestLocators(t *testing.T) {
 		fmt.Println(fmt.Sprintf("%s %s %s", callSign, l, t))
 	}
 	callSign = "S57NAW"
-	resp = Locators("S57NAW")
+	resp = Get("S57NAW")
 	if len(resp) == 0 {
 		t.Errorf("unexpected, no locators for %s ", callSign)
 	}
