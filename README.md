@@ -1,6 +1,7 @@
 # qthdb
 
 ### qthdb is QTH locator database
+If this project is used as module in another project, use locators.Get
 
 ### qthdb has only one table but its rows are smart
 
