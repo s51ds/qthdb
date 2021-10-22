@@ -9,11 +9,6 @@ import (
 
 var table Table
 
-// TODO: remove
-func init() {
-	Open("./db.gob")
-}
-
 // Table has primary key CallSign
 type Table struct {
 	Rows map[string]row.Record

@@ -8,6 +8,7 @@ import (
 )
 
 func TestTable_UpdateGetAndString(t1 *testing.T) {
+	Open("./db.gob")
 	rec, _ := row.MakeNewRecord("S59ABC", "", "", "")
 	_ = Put(rec)
 	rec, _ = row.MakeNewRecord("S59ABC", "JN76TO", "", "")
