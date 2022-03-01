@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/s51ds/qthdb/db"
 	"os"
+	"path/filepath"
 	"sort"
 	"time"
 )
@@ -15,7 +16,7 @@ func sPrintN1mmScpFormat(callSign, loc1, loc2 string) string {
 }
 
 // MakeN1mmScpFile creates N1MM scp file. File is created from data from DB
-// and customized for specified contest. month defined contest.
+// and customized for specified contest. month define contest.
 func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	if month < 0 || month > 12 {
 		return errors.New(fmt.Sprintf("invalid Month:%d", month))
@@ -102,7 +103,11 @@ func MakeN1mmScpFile(scpFileName string, month time.Month) error {
 	sort.Strings(scpLines)
 	for _, v := range scpLines {
 		if _, err := scpFile.WriteString(v + "\n"); err != nil {
+			return err
 		}
 	}
+
+	wd, _ := os.Getwd()
+	fmt.Printf("%d records write to %s", len(scpLines), wd+string(filepath.Separator)+scpFile.Name())
 	return nil
 }

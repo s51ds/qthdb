@@ -192,6 +192,10 @@ func TestMakeN1mmVhfSCPJUN2021(t *testing.T) {
 	if err := file.InsertLog("../testdata/scp/jun/S59ABC-MAY-2021.edi", ctestlog.TypeEdiFile); err != nil {
 		fmt.Println(err.Error())
 	}
+	if err := file.InsertLog("../testdata/S59ABC-NOV2021.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+
 	if err := MakeN1mmScpFile("../testdata/scp/jun/vhf-jun-2021.txt", time.June); err != nil {
 		t.Errorf("WTF, nil=")
 	}

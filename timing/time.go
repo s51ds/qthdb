@@ -43,7 +43,7 @@ func (t *LogTime) GetUnix() int64 {
 
 // GetMonth returns t short month names (JAN,FEB...,DEC)
 func (t *LogTime) GetMonth() string {
-	return shortMonthNames[t.LoggedTime.Month()-1]
+	return ShortMonthNames[t.LoggedTime.Month()-1]
 }
 
 // GetYear returns t year as string
@@ -93,7 +93,7 @@ func (t *LogTime) Sprint(hint bool) string {
 	}
 }
 
-var shortMonthNames = []string{
+var ShortMonthNames = []string{
 	"JAN",
 	"FEB",
 	"MAR",
