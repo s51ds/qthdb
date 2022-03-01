@@ -47,7 +47,7 @@ func InsertLog(fileName string, logType hamLog.Type) error {
 				if foundQSORecords {
 					line := scanner.Text()
 					if rec, err := hamLog.Parse(logType, line); err != nil {
-						fmt.Printf("%s; file=%s, line=%s\n", err.Error(), fileName, line)
+						fmt.Printf("-----> WARNING -----> %s; file=%s, line=%s\n", err.Error(), fileName, line)
 					} else {
 						if err := db.Put(rec); err != nil {
 							fmt.Printf("%s; file=%s, line=%s\n", err.Error(), fileName, line)

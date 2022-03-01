@@ -205,3 +205,15 @@ func TestMakeN1mmVhfSCPJUN2021(t *testing.T) {
 	}
 	db.Clear()
 }
+
+func TestMakeN1mmVhfSCPNOV2021(t *testing.T) {
+	db.Clear()
+	if err := file.InsertLog("../testdata/S59ABC-NOV2021.edi", ctestlog.TypeEdiFile); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := db.Persists(); err != nil {
+		fmt.Println(err.Error())
+	}
+	db.Clear()
+}

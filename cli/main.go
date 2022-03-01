@@ -60,7 +60,7 @@ func commands() {
 				if m < 1 || m > 12 {
 					return errors.New("month JAN=1...DEC=12")
 				}
-				return bl.MakeN1mmScpFile(fmt.Sprintf("scp-%s-%s", timing.ShortMonthNames[m-1], strconv.Itoa(time.Now().Year())), time.Month(m))
+				return bl.MakeN1mmScpFile(fmt.Sprintf("scp-%s-%s.txt", timing.ShortMonthNames[m-1], strconv.Itoa(time.Now().Year())), time.Month(m))
 			},
 		},
 	}
