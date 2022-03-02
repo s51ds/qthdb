@@ -16,7 +16,7 @@ func Persists() error {
 
 	if gobFileName == "" {
 		fmt.Println("-----> WARNING -----> THAT SHOULD BE GO TEST, IF NOT IT IS A BUG")
-		gobFileName = "test.gob"
+		gobFileName = "gob.test"
 		wd, _ := os.Getwd()
 		fmt.Println("Persists:", wd+string(filepath.Separator)+gobFileName)
 

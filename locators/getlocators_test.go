@@ -8,7 +8,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	if err := db.Open("../app/db.gob"); err != nil {
+	if err := db.Open("../db.gob"); err != nil {
 		fmt.Println(err.Error())
 		dir, _ := os.Getwd()
 		fmt.Println("Working directory:", dir)
