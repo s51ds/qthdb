@@ -129,6 +129,7 @@ func TestSprintScpFormat(t *testing.T) {
 
 // Temporary for generating real scp file
 func TestMakeN1mmVhfSCP(t *testing.T) {
+	// TODO: fix me
 	db.Clear()
 	if err := file.InsertLog("../testdata/scp/vhf.txt", ctestlog.TypeN1mmCallHistory); err != nil {
 		fmt.Println(err.Error())
